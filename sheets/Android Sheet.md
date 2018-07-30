@@ -1,1 +1,41 @@
 
+## Contents
+
+* [Core Concepts]
+  1. []
+
+* [Context](#context)
+   1. [What is context](#what-is-context) 
+   2. [Different types of context](#different-types-of-context)   
+   3. [How context can lead to memory issues](#how-context-can-lead-to-memory-issues)
+
+* [Activities](#activities)
+   
+  
+
+  
+## Context
+#### What is context
+* The official Android documentation about Context says that it is a -
+
+  > Interface to global information about an application environment
+
+* So basically this is the object that Android run time hands over to each Android Application that gets started. It contains all the global information that app needs to know - string resources, image resources, Android components in the app (Activity Service, Broadcast Receiver & Content Provider).
+
+* So, Context is a handle to the system, it provides  access to resources, databases and preferences, and so on. So whatever objects inherit the Context object (like activity and services objects), are allowed access to application specific resources and information about the application environment.
+
+* Another way of understanding Context would be to put it like this: It represents the current state of application.So we can call it to get information of all the other android component in the app.
+
+#### Different types of context
+  **Application Context**
+  * It is an instance which is the singleton and can be accessed in an activity via ```getApplicationContext()```. This context is tied to the lifecycle of an application. The application context can be used where you need a context whose lifecycle is separate from the current context or when you are passing a context beyond the scope of an activity.
+  * Example: If you have to create a singleton object for your application and that object needs a context, always pass the application context. Because if you pass the activity context here, it will lead to the memory leak as it will keep the reference to the activity and activity will not be garbage collected.
+  * Similarly when you have to initialize a library in an activity, always pass the application context, not the activity context.So that the context the library has is independent of the activity. Otherwise even when the activity is finished the library object will have the instance of context provided through activity, hence activity will not be garbage collected and memory leaks may occur.
+ * So we only use ```getApplicationContext()``` when you know you need a Context for something that may live longer than any other likely Context we have at your disposal.
+
+  **Activity Context**
+  *  This context is available in an activity. This context is tied to the lifecycle of an activity. The activity context should be used when you are passing the context in the scope of an activity or you need the context whose lifecycle is attached to the current context.
+  * When to use it: If you have to create an object whose lifecycle is attached to an activity, you can use the activity context.
+  *
+
+* NOTE:
