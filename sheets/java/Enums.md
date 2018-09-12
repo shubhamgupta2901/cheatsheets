@@ -1,8 +1,9 @@
 ## Contents
 * [Enums in java](#enums-in-java)
-* []
+* [Enums with constructors](#enums-with-constructors)
+* [Enum with customized value](#enum-with-customized-value)
 
-### Enums in java
+#### Enums in java
 
 * A Java enum type is a special kind of Java class used to define collections of constants. 
 * First line inside enum should be list of constants and then other things like methods, variables and constructor can be put. They look like this: 
