@@ -1,10 +1,50 @@
 ### Contents
-    * [Memory Leak Scenario 1](#memory-leak-scenario-1)
+* [Memory Leaks](#memory-leaks)
+* [Why memory leaks are bad](#why-memory-leaks-are-bad)
+* [Memory Leak Common Scenarios](#memory-leak-common-scenarios)
+* [Leak Activity to Static Reference](#leak-activity-to-static-reference)
+     * [Leak Activity to a static view](#leak-activity-to-a-static-view)
+     * [Leak Activity to a static variable](#leak-activity-to-a-static-variable)
+     * [Leak Activity to a singleton object](#leak-activity-to-a-singleton-object)
+     * [Leak Activity to a static instance of a inner class of the activity](#leak-activity-to-a-static-instance-of-a-inner-class-of-the-activity)
+* [Leak Activity to Long Running Operations](#leak-activity-to-long-running-operations)
+     * [Leak Activity to a thread](#) 
+     * [Leak Activity to a handler](#)
+     * [Leak Activity to an AsyncTask](#)
+     * [Leak Activity to Listeners](#)
+* [Leak Worker Threads](#leak-worker-threads)
 
-### Memory Leaks 
+    
+
+-------------------    
+
+#### Memory Leaks 
 
 * Since Java provides garbage collection, we only care about creating object. We don't care about cleaning up the objects from memory heap because that is done by garbage collector, but it can only collect objects which has no live strong reference or it's not reachable from any thread. **If an object, which should be collected but still lives in memory due to unintentional strong reference then it's known as memory leak in Java**. These cases generally lead to situation where  there is no memory space for creating new object in Heap, even after garbage collection.
 
+### Why memory leaks are bad
+
+* Less usable memory would be available when memory leak happens. As a result, **Android system will trigger more frequent GC events**. GC events are stop-the-world events. It means when GC happens, the rendering of UI and processing of events will stop. Users may feel slowness in application.
+
+* When your app has memory leaks, it cannot claim memory from unused objects. As a result, it will ask the operating system for more memory. When the operating system can no longer allocate more memory for your app, app user will get an **out-of-memory crash**.
+
+* Memory leak issues are mostly hard to find in QA/testing. They are hard to reproduce.
+
+### Memory Leaks Common Scenarios
+
+* There are some common patterns which lead to majority of memory leaks in android. These are:
+   * **Leak Activity to Static Reference** : A static reference lives as long as your app is in memory. An activity has lifecycles which are usually destroyed and re-created multiple times during you app’s lifecycle. If you reference an activity directly or indirectly from a static reference, the activity would not be garbage collected after it is destroyed.
+      1. Leak Activity to a static view
+      2. Leak Activity to a static variable
+      3. Leak Activity to a singleton object
+      4. Leak Activity to a static instance of a inner class of the activity 
+   * **Leak Activity to Long Running Operations**
+      1. Leak Activity to a thread 
+      2. Leak Activity to a handler
+      3. Leak Activity to an AsyncTask
+      4. Leak Activity to Listeners
+   * **Leak The Worker Thread Itself**
+      
 #### Memory Leak Scenario 1
 
 * This scenario is the **typical case of providing activity level context to classes which are independent of this activity's lifecycle**, and may live even after the activity is destroyed.
@@ -56,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
 
 #### Memory Leak Scenario 2
 
-* Another scenario of memory leak is pretty similar to what we have seen above - typical cases of passing activity level context when we should actually be using application level context.
 
-* 
 
 
