@@ -1,5 +1,6 @@
 ## Contents
 * [Activity Lifecycle](#activity-lifecycle)
+* [Scenario where onDestroy is called without onPause or onStop](#scenario-where-onDestroy-is-called-without-onPause-or-onStop)
 * [Configuration Changes](#configuration-changes)
 
 
@@ -114,6 +115,19 @@ public void onSaveInstanceState(Bundle outState) {
 * If the activity is finishing, ```onDestroy()``` is the final lifecycle callback the activity receives. If ```onDestroy()``` is called as the result of a configuration change, the system immediately creates a new activity instance and then calls ```onCreate()``` on that new instance in the new configuration.
 
 * The ```onDestroy()``` callback should release all resources that have not yet been released by earlier callbacks such as ```onStop()```.
+
+#### Scenario where onDestroy is called without onPause or onStop
+
+* ```onPause()``` and ```onStop()``` will not be invoked if ```finish()``` is called from within the ```onCreate()``` method. This might occur, for example, if you detect an error during ```onCreate()``` and call ```finish()``` as a result. In such a case, though, any cleanup you expected to be done in ```onPause()``` and ```onStop()``` will not be executed.
+
+```java
+protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        finish();
+    }
+
+```
 
 ### Configuration Changes
 
