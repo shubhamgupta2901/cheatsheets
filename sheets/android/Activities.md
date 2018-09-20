@@ -16,9 +16,15 @@
 
 ##### ```onCreate()```
 * This callback is fired when the system first creates the activity and the activity enters the *Created* state. 
-* In the ```onCreate()``` method, we perform basic application startup logic that should happen only once for the entire life of the activity. For example, your implementation of ```onCreate()``` might bind data to lists and instantiate some class-scope variables. 
+
+* In the ```onCreate()``` method, we perform basic application startup logic that should happen only once for the entire life of the activity. For example, your implementation of ```onCreate()``` might bind the layout xml file to the activity, bind data to lists and instantiate some class-scope variables. 
+
 * This method receives the parameter ```savedInstanceState```, which is a ```Bundle``` object containing the activity's previously saved state. If the activity has never existed before, the value of the ```Bundle``` object is null.
-* The following example of the ```onCreate()``` method shows fundamental setup for the activity, such as declaring the user interface (defined in an XML layout file), defining member variables, and configuring some of the UI. In this example, the XML layout file is specified by passing file’s resource ID R.layout.main_activity to setContentView().
+
+* The following example of the ```onCreate()``` method shows fundamental setup for the activity, such binding an xml layout to the activity, defining member variables, and configuring some of the UI. In this example, the XML layout file is specified by passing file’s resource ID ```R.layout.main_activity``` to ```setContentView()```.
+
+* **Why would you do the ```setContentView()``` in ```onCreate()``` of Activity class?** : ```setContentView()``` is a heavy operation because it binds an xml layout file to the activity. Since ```onCreate()``` is called only once during the activity lifecycle when it is created, it would be appropiate to do it here, rather than ```onStart()``` or ```onResume()``` which are called multiple times during the lifecycle of the activity.
+
 
 ```java
 TextView mTextView;
