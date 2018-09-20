@@ -3,7 +3,47 @@
 * [Difference between onCreate and onStart](#difference-between-oncreate-and-onstart)
 * [Scenario where onDestroy is called without onPause or onStop](#scenario-where-onDestroy-is-called-without-onPause-or-onStop)
 * [Configuration Changes](#configuration-changes)
+* [Tasks and BackStack](#tasks-and-backstacks)
+* [Launch Modes](#launch-modes)
+    * [Standard](#standard)
+    * [SingleTop](#singletop)
+    * [SingleTask](#singletask)
+    * [SingleInstance](#singleinstance)
+    
 
+#### Launch Modes
+
+* Launch modes allow us to define **how a new instance of an activity is associated with the current task**. We can define different launch modes in two ways:
+    * **using manifest file**: When you declare an activity in your manifest file, you can specify how the activity should associate with tasks when it starts.
+    * **using intent flags**: When you call ```startActivity()```, you can include a flag in the Intent that declares how (or whether) the new activity should associate with the current task.
+* Some launch modes available for the manifest file are not available as flags for an intent and, likewise, some launch modes available as flags for an intent cannot be defined in the manifest.
+* if ```ActivityA``` starts ```ActivityB```, ```ActivityB``` can define in its manifest how it should associate with the current task and ```ActivityA``` can also request how ```ActivityB``` should associate with current task using intent flags. If both activities define how ```ActivityB``` should be associated with a task, then ```ActivityA's``` request (as defined in the intent) is honored over ```ActivityB's``` request (as defined in its manifest).
+
+##### [Standard](#standard) 
+* It is the **default** launchMode. It creates a new instance of an activity in the task from which it was started. Multiple instances of the activity can be created and multiple instances can be added to the same or different tasks. 
+Eg: Suppose there is an activity stack of A -> B -> C. 
+Now if we launch B again with the launch mode as "standard", the new stack will be A -> B -> C -> B.
+    
+##### [SingleTop](#SingleTop)
+* It is the same as the standard, except if there is a previous instance of the activity that exists in the top of the stack, then it will not create a new instance but rather send the intent to the existing instance of the activity.
+Eg: Suppose there is an activity stack of A -> B. 
+Now if we launch C with the launch mode as "singleTop", the new stack will be A -> B -> C as usual. 
+Now if there is an activity stack of A -> B -> C. 
+If we launch C again with the launch mode as "singleTop", the new stack will still be A -> B -> C.
+
+* For example, suppose a task's back stack consists of root activity A with activities B, C, and D on top (the stack is A-B-C-D; D is on top). An intent arrives for an activity of type D. If D has the default "standard" launch mode, a new instance of the class is launched and the stack becomes A-B-C-D-D. However, if D's launch mode is "singleTop", the existing instance of D receives the intent through ```onNewIntent()```, because it's at the top of the stack—the stack remains A-B-C-D. However, if an intent arrives for an activity of type B, then a new instance of B is added to the stack, even if its launch mode is "singleTop"
+
+##### [SingleTask](#SingleTask)
+* The system creates a new task and instantiates the activity at the root of the new task.
+* However, if an instance of the activity already exists in a separate task, the system routes the intent to the existing instance through a call to its ```onNewIntent()``` method, rather than creating a new instance.
+* Eg: Suppose there is an activity stack of A -> B -> C -> D. 
+Now if we launch D with the launch mode as "singleTask", the new stack will be A -> B -> C -> D as usual.
+* Now if there is an activity stack of A -> B -> C -> D. 
+If we launch activity B again with the launch mode as "singleTask", the new activity stack will be A -> B. Activities C and D will be destroyed.
+
+##### [SingleInstance](#SingleInstance)
+
+---------
 
 #### Activity Lifecycle
 * When the user interacts with the application, the operating system has to create, stop and resume and destroy activities in the app. Because of this the state of activity keeps changing. The ```Activity``` class provides callbacks to the instance of activity, which allows the activity to know that a state has changed. It allows the activity to know that the system is creating it, stoping it, resuming it or destroying it.
