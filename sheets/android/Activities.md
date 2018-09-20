@@ -1,5 +1,6 @@
 ## Contents
 * [Activity Lifecycle](#activity-lifecycle)
+* [Difference between onCreate and onStart](#difference-between-oncreate-and-onstart)
 * [Scenario where onDestroy is called without onPause or onStop](#scenario-where-onDestroy-is-called-without-onPause-or-onStop)
 * [Configuration Changes](#configuration-changes)
 
@@ -115,6 +116,12 @@ public void onSaveInstanceState(Bundle outState) {
 * If the activity is finishing, ```onDestroy()``` is the final lifecycle callback the activity receives. If ```onDestroy()``` is called as the result of a configuration change, the system immediately creates a new activity instance and then calls ```onCreate()``` on that new instance in the new configuration.
 
 * The ```onDestroy()``` callback should release all resources that have not yet been released by earlier callbacks such as ```onStop()```.
+
+#### Difference between onCreate and onStart
+* **```onCreate()```**: The ```onCreate()``` is called only once during the activity lifecycle, either when the application starts, or when the activity has been destroyed and then recreated, for example during a configuration change.
+
+* **```onStart()```**: The ```onStart()``` method can be called multiple times during the lifecycle of the activity. It is called whenever the activity becomes visible to the user.
+
 
 #### Scenario where onDestroy is called without onPause or onStop
 
