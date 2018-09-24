@@ -1,10 +1,9 @@
-
-1. [Background Execution Limits]
+1. [Background Execution Restrictions](#background-execution-restrictions)
     * [Background Service Limitations](#background-service-limitations)
     * [Broadcast Limitations](#broadcast-limitations)
-2. [Job Intent Services](#job-intent-services)
+3. [Job Intent Services](#job-intent-services)
 
-### Background Execution Limits
+### Background Execution Restrictions
 * Whenever an app runs in the background, it consumes some of the device's limited resources, like RAM. This can result in an impaired user experience, especially if the user is using a resource-intensive app. 
 
 * To improve the user experience, Android 8.0 (API level 26) imposes **limitations on what apps can do while running in the background**. 
