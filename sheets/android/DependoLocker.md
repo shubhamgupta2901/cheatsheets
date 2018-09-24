@@ -1,3 +1,22 @@
+### Contents
+* [Bluetooth and BLE](#bluetooth-and-ble)
+* [ATT and GATT](#att-and-gatt)
+        
+
+### Bluetooth and BLE
+* **Bluetooth** is a  wireless technology standard. Bluetooth was developed as a way to exchange data over a short range without the need for wires. 
+
+* Bluetooth was originally designed for continuous, streaming data applications. That means that you can exchange a lot of data at a close range. 
+
+* **Bluetooth Low Energy** Also known as Bluetooth 4.0. When talking about Bluetooth Low Energy vs. Bluetooth, the key difference is in **BLE's low power consumption**. Applications on BLE can run on a small battery for four to five years. It is vital for applications that **only need to exchange small amounts of data periodically**.
+
+*  Unlike classic Bluetooth, **BLE remains in sleep mode constantly except for when a connection is initiated**.
+
+* In summary, Bluetooth and Bluetooth Low Energy are used for very different purposes. Bluetooth can handle a lot of data, but consumes battery life quickly and costs a lot more. BLE is used for applications that do not need to exchange large amounts of data, and can therefore run on battery power for years at a cheaper cost.
+
+
+
+
 * A Locker consists of multiple compartments. Each compartment has a BLE device attached to it.
 * Each compartment has multiple shelves. 
 * To open a shelf, we need to connect the user device to the compartment BLE device, Once the connection is established, by manipulating the bits, we can open the particular locker.
