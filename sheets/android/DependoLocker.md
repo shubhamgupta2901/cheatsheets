@@ -1,7 +1,8 @@
 ### Contents
 * [Bluetooth and BLE](#bluetooth-and-ble)
 * [ATT and GATT](#att-and-gatt)
-* [TABLET MODE](#tablet-mode)
+* [Configuration](#configuration)
+* [Create a new locker](#create-a-new-locker)
         
 
 #### Bluetooth and BLE
@@ -15,31 +16,99 @@
 
 #### ATT vs GATT
 
-#### TABLET MODE
+---------------------------------------------------------------------------------------------------------------------------
+#### Configuration
 
-1. check for BLE support in the application.
+* Every physical locker contains multiple compartments,Each compartments has multiples shelves. 
+* Shelves come in three different sizes: small, medium, and large, user can select a shelf to put the shipments according to size of the shipments.
+* Each compartment is configured with a unique BLE device, Hence every compartment can be uniquely identified with the mac address of the BLE device.
+* To book a locker, it can be searched from the android app through pin code of the area. Once the locker is selected and user books it (if it is empty?), user gets a passcode to access the locker, he can use this passcode to select a shelf and put his shipment. 
+* The (same?) passcode can be shared with other people, if they want to get the shipment stored in the locker.
 
+#### Create a new locker
+
+* To create a new locker following points need understanding:
+
+1) **Android Device ID**:  This returns a 64bit hex string that is **unique to each combination of app-signing key, user, and device**.
+```Settings.Secure.getString(AppMain.getContext().getContentResolver(), Settings.Secure.ANDROID_ID)```
+The value may change if a factory reset is performed on the device or if an APK signing key changes.
+
+2) **Server Locker Id**: For every physical locker, we create a server Locker which looks like this: 
+
+```ruby
+
+private String _id;
+
+    private String android_id;
+
+    private String locker_id;
+
+    private String address;
+
+    private String landmark;
+
+    private String locality;
+
+    private String city;
+
+    private String state;
+
+    private String countre;
+
+    private int pincode;
+
+    private double lat;
+
+    private double lng;
+
+    private List<Compartment> compartments;
+
+```
+
+
+
+Configuration: There 
 
 * A Locker consists of multiple compartments. Each compartment has a BLE device attached to it.
 * Each compartment has multiple shelves. 
 * To open a shelf, we need to connect the user device to the compartment BLE device, Once the connection is established, by manipulating the bits, we can open the particular locker.
 * Two flavours of same application: ```TABLET_MODE``` and ```CUSTOMER_MODE```.
 
-* Check if the device has BLE support
+
+
+
+#### TABLET MODE
+
+1. Check for bluetooth support in the device. Availabe above API 18.
+
 ```java
-private boolean hasBLESupport() {
-        // Use this check to determine whether BLE is supported on the device.
-        if (!getPackageManager().hasSystemFeature(
-                PackageManager.FEATURE_BLUETOOTH_LE)) {
+public static boolean checkBleSupport(Context mContext) {
+
+        if(android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
             return false;
-        }
-        // Initializes a Blue tooth adapter.
-        final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+
+        final BluetoothManager bluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
         if (bluetoothManager.getAdapter() == null)
             return false;
-        return true;
+        else return true;
+
     }
+
 ```
+
+2. Request for runtime permissions if the device is running Android Marshmallow or above. Permissions required:
+
+```ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BLUETOOTH, ACCESS_BLUETOOTH_ADMIN, READ_SMS, RECEIVE_SMS```
+
+
+
+
+3. 
+
+4. **Server Device Id**: For every locker created, there will be a tablet device assigned to it, and will be coupled with it. 
+
+
+
 
 * If the ```Build.VERSION.SDK_INT``` is 24 or greater, take  following runtime permissions.
  ```ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BLUETOOTH, ACCESS_BLUETOOTH_ADMIN, READ_SMS, RECEIVE_SMS```
