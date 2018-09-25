@@ -3,7 +3,7 @@
 * [Bluetooth and BLE](#bluetooth-and-ble)
 * [ATT and GATT](#att-and-gatt)
 * [Configuration](#configuration)
-* [Create a new locker](#create-a-new-locker)
+* [Register a new Locker](#register-a-new-locker)
         
 
 #### Bluetooth and BLE
@@ -18,15 +18,76 @@
 #### ATT vs GATT
 
 ---------------------------------------------------------------------------------------------------------------------------
-#### Configuration
+#### Hardware Configuration
 
 * Every physical locker contains multiple compartments,Each compartments has multiples shelves. 
+
 * Shelves come in three different sizes: small, medium, and large, user can select a shelf to put the shipments according to size of the shipments.
+
 * Each compartment is configured with a unique BLE device, Hence every compartment can be uniquely identified with the mac address of the BLE device.
+
+* **Every compartment has only one BLE device attached to it, and to open/close all the shelves in that compartment, we need to connect with the same BLE device in the compartment (and modify different bits to open/close different shelves in it.)**. 
+
+* An android tablet is attached to the locker with this application installed in it. The tablet will take instruction from the user, connect with one of the BLE devices in the locker and then open/close the shelves using BLE communication with the locker.
+
+#### How it works
+
 * To book a locker, it can be searched from the android app through pin code of the area. Once the locker is selected and user books it (if it is empty?), user gets a passcode to access the locker, he can use this passcode to select a shelf and put his shipment. 
 * The (same?) passcode can be shared with other people, if they want to get the shipment stored in the locker.
 
-#### Create a new locker
+
+#### Representing Locker
+
+* Locker Model looks like this:
+
+```java
+public class Locker {
+
+    private String _id;
+    private String android_id;
+    private String locker_id;
+    private String address;
+    private String landmark;
+    private String locality;
+    private String city;
+    private String state;
+    private String countre;
+    private int pincode;
+    private double lat;
+    private double lng;
+    private List<Compartment> compartments;
+    
+}
+```
+
+* A ```Compartment``` looks like this:
+```java
+public class Compartment {
+    private String _id;
+    //Represents BLE Device's MAC Address
+    private String compartment_id;
+    private List<Shelf> shelves;
+    private String number;
+}
+
+```
+
+* And a shelf looks like this:
+```java
+public class Shelf {
+    private String _id;
+    private String number;
+    private Float length;
+    private Float breadth;
+    private Float height;
+    private String type;
+    private String status;
+    private String is_occupied;
+
+}
+```
+
+#### Register a new Locker
 
 * To create a new locker following points need understanding:
 
@@ -34,47 +95,28 @@
 ```Settings.Secure.getString(AppMain.getContext().getContentResolver(), Settings.Secure.ANDROID_ID)```
 The value may change if a factory reset is performed on the device or if an APK signing key changes.
 
-2) **Server Locker Id**: For every physical locker, we create a server Locker which looks like this: 
+2) **Server Locker Id**: When a new locker is created in the web console, it is assigned a 10 digit locker_id which is unique. No two lockers can have same locker_id. 
 
-```ruby
+* Once a locker is created, according to the hardware configuration of the actual locker, compartment and their shelves are created and assigned to the locker.
 
-private String _id;
+* While creating a ```Compartment```, it is provided with the **mac address** of the BLE device attached to it. 
 
-    private String android_id;
-
-    private String locker_id;
-
-    private String address;
-
-    private String landmark;
-
-    private String locality;
-
-    private String city;
-
-    private String state;
-
-    private String countre;
-
-    private int pincode;
-
-    private double lat;
-
-    private double lng;
-
-    private List<Compartment> compartments;
-
-```
+* With above information, we have successfully registered a new locker in our server database.
 
 
+#### Linking tablet with the locker
 
-Configuration: There 
+* The Locker also has an android tab attached to it, with Locker app installed in it. We need to map this android device to the locker.
 
-* A Locker consists of multiple compartments. Each compartment has a BLE device attached to it.
-* Each compartment has multiple shelves. 
-* To open a shelf, we need to connect the user device to the compartment BLE device, Once the connection is established, by manipulating the bits, we can open the particular locker.
-* Two flavours of same application: ```TABLET_MODE``` and ```CUSTOMER_MODE```.
-
+* There can be three scenarios: 
+  1. **A new Tab is being linked to a new locker**: 
+  In this case, Android Id for the device is generated, and saved to Shared Preference. User is asked to insert the Server Locker Id in the application (which is provided to him when the locker is created in the server database).
+  Once it is submitted, in the server side, Locker with this locker id is fetched, and the android id is saved in it, completing the mapping. Server returns the locker id back to the tab, which it saves in Shared Preference.
+  Next time when the application is opened, android id and server locker id is fetched from shared preference, and we don't require to link this tab to server Locker.
+ 
+  2. **An already linked tabled has to be linked with locker, because the app was reinstalled**: Again android id will be generated in the device, (which will most probably be same) and user will have to enter the locker id provided by server database. This new android id will be saved, replacing the previous one (in case the android id generated this time is different) in the locker, and linking will be complete.
+  
+  3. **A tab was already linked to the locker, but is being replaced with a new tab due to some error**: In this case too, since the server replaces the previous android id with new one, linking will not create any issues
 
 
 
