@@ -1,14 +1,21 @@
 
 ### Contents
-* [Bluetooth and BLE](#bluetooth-and-ble)
-* [ATT and GATT](#att-and-gatt)
-* [Hardware Configuration](#hardware-configuration)
-* [How it works](#how-it-works)
-* [Representing Locker](#representing-locker)
-* [Register a new Locker](#register-a-new-locker)
-* [Linking tablet with the locker](#linking-tablet-with-the-locker)
-* [Transactions](#transactions)
-        
+* [BLE Concepts](#ble-concepts) 
+  * [Bluetooth and BLE](#bluetooth-and-ble)
+  * [ATT and GATT](#att-and-gatt)
+  * [Services and Characterstics](#services-and-characterstics)
+  * [UUID](#uuid)
+* [Android Bluetooth Library](#android-bluetooth-library)  
+* [Locker](#locker)
+  * [How it works](#how-it-works)
+  * [Hardware Configuration](#hardware-configuration)
+  * [Representing Locker](#representing-locker)
+  * [Register a new Locker](#register-a-new-locker)
+  * [Linking tablet with the locker](#linking-tablet-with-the-locker)
+  * [Transactions](#transactions)
+  
+### BLE
+
 
 #### Bluetooth and BLE
 * Bluetooth is a  wireless technology standard. It was developed as a way to exchange a lot of data over a short range without the need for wires.
@@ -20,6 +27,18 @@
 * In summary, Bluetooth and Bluetooth Low Energy are used for very different purposes. Bluetooth can handle a lot of data, but consumes battery life quickly and costs a lot more. BLE is used for applications that do not need to exchange large amounts of data, and can therefore run on battery power for years at a cheaper cost.
 
 #### ATT and GATT
+
+* GATT (Generic Attribute Profile) **defines the way that two Bluetooth Low Energy devices transfer data back and forth** using concepts called Services and Characteristics. **It makes use of a generic data protocol called the Attribute Protocol (ATT)**.
+
+* **ATT (Attribute Protocol) is a much lower level mechanism that basically defines how to transfer a unit of data (an attribute). GATT is built on top of ATT and defines how higher level services are composed and the framework for operating on those services.**
+
+
+* Android 4.3 (API level 18) introduces built-in platform support for Bluetooth Low Energy (BLE) in the **central role** and provides APIs that apps can use to discover devices, query for services, and transmit information.
+
+* **Central vs. peripheral**. This applies to the BLE connection itself. The device in the central role scans, looking for advertisement, and the device in the peripheral role makes the advertisement.
+
+* 
+
 
 ---------------------------------------------------------------------------------------------------------------------------
 #### Hardware Configuration
