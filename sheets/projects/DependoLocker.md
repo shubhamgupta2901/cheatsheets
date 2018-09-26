@@ -2,8 +2,12 @@
 ### Contents
 * [Bluetooth and BLE](#bluetooth-and-ble)
 * [ATT and GATT](#att-and-gatt)
-* [Configuration](#configuration)
+* [Hardware Configuration](#hardware-configuration)
+* [How it works](#how-it-works)
+* [Representing Locker](#representing-locker)
 * [Register a new Locker](#register-a-new-locker)
+* [Linking tablet with the locker](#linking-tablet-with-the-locker)
+* [Transactions](#transactions)
         
 
 #### Bluetooth and BLE
@@ -15,12 +19,12 @@
 
 * In summary, Bluetooth and Bluetooth Low Energy are used for very different purposes. Bluetooth can handle a lot of data, but consumes battery life quickly and costs a lot more. BLE is used for applications that do not need to exchange large amounts of data, and can therefore run on battery power for years at a cheaper cost.
 
-#### ATT vs GATT
+#### ATT and GATT
 
 ---------------------------------------------------------------------------------------------------------------------------
 #### Hardware Configuration
 
-* Every physical locker contains multiple compartments,Each compartments has multiples shelves. 
+* Every physical locker contains multiple compartments,Each compartment has multiples shelves. 
 
 * Shelves come in three different sizes: small, medium, and large, user can select a shelf to put the shipments according to size of the shipments.
 
@@ -32,13 +36,15 @@
 
 #### How it works
 
+* There are two flavours of the application: TABLET_MODE and CUSTOMER_MODE. TABLET_MODE flavour is installed in the tablet for interacting with the Lockers and CUSTOMER_MODE is distributed to users.
+
 * To book a locker, it can be searched from the android app through pin code of the area. Once the locker is selected and user books it (if it is empty?), user gets a passcode to access the locker, he can use this passcode to select a shelf and put his shipment. 
 * The (same?) passcode can be shared with other people, if they want to get the shipment stored in the locker.
 
 
 #### Representing Locker
 
-* Locker Model looks like this:
+* A ```Locker``` looks like this:
 
 ```java
 public class Locker {
@@ -72,7 +78,8 @@ public class Compartment {
 
 ```
 
-* And a shelf looks like this:
+* And a ```Shelf``` looks like this:
+
 ```java
 public class Shelf {
     private String _id;
@@ -91,13 +98,13 @@ public class Shelf {
 
 * To create a new locker following points need understanding:
 
-1) **Android Device ID**:  This returns a 64bit hex string that is **unique to each combination of app-signing key, user, and device**.
+  1. **Android Device ID**:  This returns a 64bit hex string that is **unique to each combination of app-signing key, user, and device**.
 ```Settings.Secure.getString(AppMain.getContext().getContentResolver(), Settings.Secure.ANDROID_ID)```
 The value may change if a factory reset is performed on the device or if an APK signing key changes.
 
-2) **Server Locker Id**: When a new locker is created in the web console, it is assigned a 10 digit locker_id which is unique. No two lockers can have same locker_id. 
+  2. **Server Locker Id**: When a new locker is created in the web console, it is assigned a 10 digit locker_id which is unique. No two lockers can have same locker_id. 
 
-* Once a locker is created, according to the hardware configuration of the actual locker, compartment and their shelves are created and assigned to the locker.
+* Once a Locker is created, according to the hardware configuration of the actual locker, compartment and their shelves are created and assigned to the locker.
 
 * While creating a ```Compartment```, it is provided with the **mac address** of the BLE device attached to it. 
 
@@ -118,11 +125,9 @@ The value may change if a factory reset is performed on the device or if an APK 
   
   3. **A tab was already linked to the locker, but is being replaced with a new tab due to some error**: In this case too, since the server replaces the previous android id with new one, linking will not create any issues
 
+#### Transcations
 
-
-#### TABLET MODE
-
-1. Check for bluetooth support in the device. Availabe above API 18.
+* Check for bluetooth support in the device. Availabe above API 18.
 
 ```java
 public static boolean checkBleSupport(Context mContext) {
@@ -139,23 +144,14 @@ public static boolean checkBleSupport(Context mContext) {
 
 ```
 
-2. Request for runtime permissions if the device is running Android Marshmallow or above. Permissions required:
+* Request for runtime permissions if the device is running Android Marshmallow or above. Permissions required:
 
 ```ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BLUETOOTH, ACCESS_BLUETOOTH_ADMIN, READ_SMS, RECEIVE_SMS```
 
+*  Sync android id of the device with the locker id. As mentioned in  [Linking tablet with the locker](/linking-tablet-with-locker/)
 
+* Once the tablet and locker id are synced, we can go ahead with the transaction. 
 
-
-3. 
-
-4. **Server Device Id**: For every locker created, there will be a tablet device assigned to it, and will be coupled with it. 
-
-
-
-
-* If the ```Build.VERSION.SDK_INT``` is 24 or greater, take  following runtime permissions.
- ```ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BLUETOOTH, ACCESS_BLUETOOTH_ADMIN, READ_SMS, RECEIVE_SMS```
- 
- * When all permissions are granted, check for the app flavour:
+*  
  
  
