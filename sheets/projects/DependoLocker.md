@@ -12,7 +12,8 @@
   * [Representing Locker](#representing-locker)
   * [Register a new Locker](#register-a-new-locker)
   * [Linking tablet with the locker](#linking-tablet-with-the-locker)
-  * [Transactions](#transactions)
+  * [Transaction Flowchart](#transaction-flowchart)
+ 
   
 ### BLE
 
@@ -144,7 +145,10 @@ The value may change if a factory reset is performed on the device or if an APK 
   
   3. **A tab was already linked to the locker, but is being replaced with a new tab due to some error**: In this case too, since the server replaces the previous android id with new one, linking will not create any issues
 
-#### Transcations
+#### Transcation Flowchart
+
+![Locker Flowchart](https://github.com/shubhamgupta2901/cheatsheets/blob/master/sheets/projects/Locker%20flowchart.png)
+
 
 * Check for bluetooth support in the device. Availabe above API 18.
 
