@@ -38,8 +38,15 @@
 
 * **Central vs. peripheral**. This applies to the BLE connection itself. The device in the central role scans, looking for advertisement, and the device in the peripheral role makes the advertisement.
 
-* 
+----------------------------------------------------------------------------------------------------------------------------
+* **UUID:** A universally unique identifier (UUID) is a 128-bit (16 bytes) number that is guaranteed (or has a high probability) to be globally unique. 
 
+* **Services:** Conceputally similar characterstics are grouped together to form a service. A Service is uniquely identified by UUID.
+
+* **Characteristics:**: They are basic blocks for ble communication. They too are uniquely identified by a UUID and has a value. This value is array of bytes of variable length. Both GATT server and clients with correct set of permissions can modify these values. This is how commmunication happens with devices.
+
+
+![ble hierarchy](https://github.com/shubhamgupta2901/cheatsheets/blob/master/sheets/projects/gsbl_0401.png)
 
 ---------------------------------------------------------------------------------------------------------------------------
 #### Hardware Configuration
@@ -148,6 +155,8 @@ The value may change if a factory reset is performed on the device or if an APK 
 #### Transcation Flowchart
 
 ![Locker Flowchart](https://github.com/shubhamgupta2901/cheatsheets/blob/master/sheets/projects/Locker%20flowchart.png)
+
+
 
 
 * Check for bluetooth support in the device. Availabe above API 18.
