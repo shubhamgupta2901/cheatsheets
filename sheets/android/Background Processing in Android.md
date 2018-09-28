@@ -1,9 +1,9 @@
 ## Background Processing in Android
-  *[Threads And Handlers](#threads-and-handlers)
+  * [Threads And Handlers](#threads-and-handlers)
 
-* Every Android app has a main thread which is in charge of handling UI, if there is too much work happening on this thread, the app appears to hang or slow down, leading to an undesirable user experience. This leads to Application not Responding Error.
+* Every Android app has a main thread (also called UI Thread) which is in charge of handling UI, if there is too much work happening on this thread, the app appears to hang or slow down, leading to an undesirable user experience. This leads to Application not Responding Error(ANR).
 
-* Any long-running computations and operations such as decoding a bitmap, accessing the disk, or performing network requests should be done on a separate background thread. In general, anything that takes more than a few milliseconds should be delegated to a background thread.
+* Any long-running operations such as decoding a bitmap, accessing the disk, or performing network requests should be done on a separate background thread. In general, anything that takes more than a few milliseconds should be delegated to a background thread.
 
 * This will improve the app performance by providing better user experience and save us from ANR. Also there are some operations like HTTP calls which are not allowed to be performed in the main thread.
 
@@ -19,4 +19,4 @@
 
 * The data which can be posted via the ```Handler``` class can be an instance of the ```Message``` or the ```Runnable``` class. A ```Handler``` is particularly useful if you have to post data multiple times to the main thread.
 
-* 
+* Android is a single threaded UI framework. There is one UI thread responsible for drawing on the canvas. **If you touch UI in any other thread, you meet ```CalledFromWrongThreadException```** ; Therefore some mechanism is needed to perform UI work in UI thread. Most of the developers have used Handler to accomplish that.
