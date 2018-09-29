@@ -2,7 +2,7 @@
  * [Why Background Processing](#why-background-processing)
  * [Threads And Runnable](#threads-and-runnable)
  * [Problems with Threads in Android](#problems-with-threads-in-android)
- * [Handlers and Loopers](#handlers-and-loopers)
+ * [Handlers](#handlers)
  
  
 
@@ -19,8 +19,6 @@
 
 * Android supports the usage of the ```Thread``` class to perform asynchronous processing. Android also supplies the ```java.util.concurrent``` package to perform something in the background. 
 
-* The problem with threads is if you need to update the user interface from a new Thread, you need to synchronize with the main thread i.e you will have to wait in the main thread for this new thread to complete its execution and join to main thread before we can update the user interface. 
-
 * This issue can be solved using **Handlers**. A ```Handler``` object registers itself with the thread in which it is created. It provides a channel to send data to this thread, for example the main thread. 
 
 * The data which can be posted via the ```Handler``` class can be an instance of the ```Message``` or the ```Runnable``` class. A ```Handler``` is particularly useful if you have to post data multiple times to the main thread.
@@ -31,6 +29,16 @@
  
  * **If we need to update the UI from another UI Thread, we need to synchronize with the UI thread**. Because of this restrictions and complexity we need additional constructed classes in Android to handle concurrency in comparison with standard Java.
  
- * 
+ * In addition, Java threads are one-time use only and die after executing its run method.
+
+ 
+ ### Handlers 
+ 
+ * Handler is part of Android's framework which can be used to manage threads. **Handlers allow communicating back with UI thread from another background thread**.
+ 
+ * Every class has its own 
+ 
+ 
+*  Looper is a worker that keeps a thread alive, loops through MessageQueue and sends messages to the corresponding handler to process.
  
  
