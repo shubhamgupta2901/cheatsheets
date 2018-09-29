@@ -31,4 +31,6 @@
  
  * **If we need to update the UI from another UI Thread, we need to synchronize with the UI thread**. Because of this restrictions and complexity we need additional constructed classes in Android to handle concurrency in comparison with standard Java.
  
+ * 
+ 
  
