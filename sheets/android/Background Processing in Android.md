@@ -4,7 +4,7 @@
  * [Communicate with the UI thread](#communicate-with-the-ui-thread)
  * [Loopers](#loopers)
  * [Handlers](#handlers)
- 
+ * [HandlerThreads](#handlerthreads)
  
 
 
@@ -352,7 +352,56 @@ public class BackgroundThread extends Thread {
 }
 ```
 
+ #### HandlerThreads
+ 
+ * **HandlerThread is a class for starting a new thread that has a Looper (hence an associated MessageQueue) attached** so that one doesn’t have to go through creating a Thread and calling ```Looper.prepare()```, ```Looper.loop()```, etc. in that. 
 
+* Once a HandlerThread is started, it sets up queuing through a Looper and MessageQueue and waits for incoming messages to process:
+
+```java
+HandlerThread handlerThread = new HandlerThread("HandlerThread");
+handlerThread.start();
+ 
+// Create a handler attached to the HandlerThread's Looper
+mHandler = new Handler(handlerThread.getLooper()) {
+    @Override
+    public void handleMessage(Message msg) {
+        // Process messages here
+    }
+};
+ 
+// We can now send messages from other threads, which have reference to this handler, using mHandler.sendMessage(), it will be enqueued in handlerThread's MessageQueue
+```
+
+* There's only one associated MessageQueue on the thread, hence execution is guaranteed to be sequential and therefore thread-safe. Behind the scenes, **HandlerThread guarantees no race condition between the Looper creation and sending messages by making ```handlerThread.getLooper()``` a blocking call until the it is ready to receive messages**. This is an important reason why HandlerThread should be used over manual setup with Looper.prepare(), Looper.loop(), Looper.quit(), etc.
+
+* The ```HandlerThread.onLooperPrepared()``` method can be used to execute some sort of setup before the Looper loops, like creating a Handler that will be associated with the HandlerThread. This method is invoked on the background thread when the Looper is prepared (after the Looper.prepare() call).
+
+```java
+private class MyHandlerThread extends HandlerThread {
+
+    Handler handler;
+
+    public MyHandlerThread(String name) {
+        super(name);
+    }
+
+    @Override
+    protected void onLooperPrepared() {
+        handler = new Handler(getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                // process incoming messages here
+                // this will run in non-ui/background thread
+            }
+        };
+    }
+}
+```
+
+* You generally need a thread attached with a Looper when you want sequential execution of tasks without race conditions and keep a thread alive even after a particular task is completed so that it can be reused so that you don’t have to create new thread instances.
+
+* Also starting the same thread object again raises IllegalThreadStateException with a Thread already started message.
 
 
   
