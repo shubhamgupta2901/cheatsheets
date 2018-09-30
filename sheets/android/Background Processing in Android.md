@@ -1,35 +1,38 @@
 ## Contents
  * [Why Background Processing](#why-background-processing)
- * [Threads And Runnable](#threads-and-runnable)
- * [Problems with Threads in Android](#problems-with-threads-in-android)\
+ * [Problems with Threads in Android](#problems-with-threads-in-android)
  * [Communicate with the UI thread](#communicate-with-the-ui-thread)
- * [Handlers](#handlers)
  * [Loopers](#loopers)
+ * [Handlers](#handlers)
  
  
+
 
  ------------------------------------------------------------------
  ### Why Background Processing
 
-* Every Android app has a main thread (also called UI Thread) which is in charge of handling UI, if there is too much work happening on this thread, the app appears to hang or slow down, leading to an undesirable user experience. This leads to **Application Not Responding** Error(ANR).
+* Threads are the smallest sequence of instructions that can be managed independently by operating system. They are units of computation that run simultaneously within a process.They usually reside in a process and share resources such as memory (but have independent call stacks). Threads running in the same process can communicate with each other via shared objects or message passing. 
 
-* Any long-running operations such as decoding a bitmap, accessing the disk, or performing network requests should be done on a separate background thread. In general, anything that takes more than a few milliseconds should be delegated to a background thread.
+* Android also supports the usage of the ```Thread``` class to perform asynchronous processing. 
 
-* This will improve the app performance by providing better user experience and save us from ANR. Also there are some operations like HTTP calls which are not allowed to be performed in the main thread.
+* In Android, when an application is launched, the system creates a thread of execution called **main**. This main thread (also called the UI thread) is responsible for drawing the user interface.  It is the thread responsible for what the user gets the see on the screen and interacts with.
 
-### Threads And Runnables
+* **All the applcation components (Activity, Service, BroadcastReceiver, Content Providers) instantiated in the same process/application created in the main thread only.** So for example:
+  * Start of an Activity
+  * Execution of a Service
+  * Receival of BroadcastReceiver (onReceive())
+  * Querying a content provider
+  * Responding to system callbacks for user events like onTouchListener, onKeyDown
 
-* Android supports the usage of the ```Thread``` class to perform asynchronous processing. Android also supplies the ```java.util.concurrent``` package to perform something in the background. 
+* All these and more,are processed on the main thread. *This is why long running operations (like network access, database queries, complicated calculations, accessing big files or any task that could possibly take more than 5 seconds) should not be executed on the main thread which will cause it to delay in drawing the UI leading to an unresponsive laggy application.* It will show the **Application Not Responding (ANR)** dialog.This could lead to users uninstalling your app and submitting low ratings and negative feedbacks on the play store.
 
-* This issue can be solved using **Handlers**. A ```Handler``` object registers itself with the thread in which it is created. It provides a channel to send data to this thread, for example the main thread. 
-
-* The data which can be posted via the ```Handler``` class can be an instance of the ```Message``` or the ```Runnable``` class. A ```Handler``` is particularly useful if you have to post data multiple times to the main thread.
+* Hence, all sorts of intensive operations should be done in Background/Worker threads. 
 
  ### Problems with Threads in Android
  
  * Android is a single threaded UI framework. There is one UI thread responsible for drawing on the canvas. **If we touch UI in any other thread, we will meet ```CalledFromWrongThreadException```**. So no other thread can directly handle UI. Therefore some mechanism is needed to perform UI work in UI thread. 
  
- * **If we need to update the UI from another UI Thread, we need to synchronize with the UI thread**. We will need to joing the thread to UI Thread using ```Thread.join()``` to know that the task assigned was completed or not. It gets even tricikier if we want to do some work in background thread partially, and update the results in the UI Thread. Because of these restrictions and complexity we need additional constructed classes in Android to handle concurrency in comparison with standard Java.
+ * **If we need to update the UI from another UI Thread, we need to synchronize with the UI thread**. We will need to joing the thread to UI Thread using ```Thread.join()``` to know that the task assigned was completed or not. It gets even trickier if we want to do some work in background thread partially, and update the results in the UI Thread. Because of these restrictions and complexity we need additional constructed classes in Android to handle concurrency in comparison with standard Java.
  
  * In addition, Java threads are one-time use only and die after executing its run method.
 
@@ -216,7 +219,16 @@ class LooperThread extends Thread {
     }
 }
 ```
-* **A thread can have only one associated Looper and hence a single message queue.** So if multiple threads tries to send messages to a particular Looper thread then all of them will be processed sequentially. Trying to setting up another Looper will throw a runtime error with a message like this java.lang.RuntimeException: Only one Looper may be created per thread.
+
+Starting a thread still remains the same:
+
+```java
+LooperThread looperThread = new LooperThread();
+looperThread.start();
+```
+* Since we have created a handler inside the thread, any thread which has its reference can  can send Messages or post Runnables.These will go inside the message queue of this thread, and looper will dequeue them and dispatch them to handlers. 
+
+* **A thread can have only one associated Looper and hence a single message queue.** So if multiple thread tries to send messages to a particular Looper thread then all of them will be processed sequentially. Trying to setting up another Looper will throw a runtime error with a message like this java.lang.RuntimeException: Only one Looper may be created per thread.
 
 * There are 2 methods to terminate a Looper:
  1. ```Looper.quit()``` – Terminates the Looper without processing any more messages in the MessageQueue. Any attempt to post messages to the queue will fail once the Looper is asked to quit. For example, the ```Handler.sendMessage()``` or ```Handler.post()``` dispatching methods will return false.
@@ -230,9 +242,115 @@ class LooperThread extends Thread {
    * It is associated with the UI thread via ```Looper.prepareMainLooper()``` and can be done only once per application. Trying to call this in some other Thread to attach the main looper will throw an exception.
 
 
+ ### Handlers
+ 
+* A Handler defines a set of methods using which we can post/send (as well as remove) and process Message (data message) and Runnable (task message) objects in the MessageQueue associated with the Thread-specific Looper. 
 
+* Each Handler instance is actually bound to the thread (and hence the message queue associated with the thread) in which it is created. It delivers Message and Runnable objects to that associated MessageQueue and executes them when they get dispatched by the Looper.
 
+* **A Handler has to be bound to a Looper else they cannot function**. A Looper is strictly required for it to connect to a queue to insert messages and receive messages from the Looper. 
 
+* When creating a Handler object you’ve to pass the Looper object as the first argument to the constructor explicitly. If not then it binds to the Looper of the current thread. If the current thread doesn’t have a Looper then a RuntimeException will be thrown.
+
+* Multiple Handlers doesn’t ensure concurrent execution as the Messages/Runnables will be posted in the queue from which they’re processed sequentially.
+
+* As seen above Handlers are quite handy when we need communication between two threads. Handler does it by passing the message of a thread to another thread's message queue.We can also enqueue a Runnable to the MessageQueue using Handlers:
+
+```java
+Runnable r = new Runnable() {
+    @Override
+    public void run() {
+        System.out.println("My Runnable");
+    }
+};
+ 
+Handler handler = new Handler();
+handler.post(r);
+```
+
+* The Handler posts the Runnable in the MessageQueue and once the Looper gets to it, the Runnable is executed.Here we have posted a runnable from same thread. We can also post runnables from other threads (which have reference to this handler) to this thread. The runnable will be delivered from that thread to this thread, and will enqueue in the MessageQueue. 
+
+* There’s  also ```postDelayed()``` and ```sendMessageDelayed()``` using which you can schedule the processing of Runnable and Message objects to a later time.
+
+* So handlers have two primary jobs:
+  1. To enqueue an action to be performed on a different thread than the one we are using.
+  2. To schedule messages and runnables to be executed at some point in future.(In same thread or another, depending where the handler was instantiated)
+
+* A very important thing to remember is that **only Message objects are allowed in the MessageQueue**. Hence Runnables sent through the post* methods and what integers sent through sendEmptyMessage* are wrapped into Message objects.
+
+```java
+public class DemoActivity extends AppCompatActivity {
+
+    private ProgressBar progressBar;
+    private Button button;
+    private ProgressHandler handler;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_demo);
+        bindViews();
+        handler = new ProgressHandler(progressBar);
+        setOnClickListeners();
+    }
+
+    private void bindViews() {
+        progressBar = findViewById(R.id.progressBar1);
+        progressBar.setMax(10);
+        button = findViewById(R.id.button1);
+    }
+
+    private void setOnClickListeners() {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new BackgroundThread(handler,progressBar).start();
+            }
+        });
+    }
+
+    static class ProgressHandler extends Handler{
+        ProgressBar progressBar;
+        public ProgressHandler(ProgressBar progressBar) {
+            this.progressBar = progressBar;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            progressBar.setProgress(msg.arg1);
+        }
+    }
+
+}
+```
+
+```java
+public class BackgroundThread extends Thread {
+    private  Handler handler;
+    private  ProgressBar progressBar;
+
+    BackgroundThread(Handler handler, ProgressBar progressBar){
+        //receives the reference of handler from the main thread.
+        this.handler = handler;
+        this.progressBar = progressBar;
+    }
+    @Override
+    public void run() {
+        super.run();
+        for (int i = 0; i<10; i++){
+            SystemClock.sleep(500);
+            final int finalI = i+1;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                   progressBar.setProgress(finalI );
+                }
+            });
+        }
+    }
+}
+```
 
 
 
