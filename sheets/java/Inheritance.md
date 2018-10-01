@@ -5,10 +5,10 @@
  * [Types of Inheritance](#types-of-inheritance)
    * [Inheritance thorugh Classes](#inheritance-through-classes)
    * [Addition Inheritance through Interfaces](#additional-interfaces-through-interfaces)
+ * [Multiple Inheritance in JAVA](#multiple-inheritance-in-java)
+   * [Why multiple inheritance is not supported in java](#why-multiple-inheritance-is-not-supported-in-java)
+   * [JAVA and Multiple Inheritance](#java-8-and-multiple-inheritance)
  
-
-
- ------------------------------------------------------------------------------------------------------------------------
   
 ### Inheritance
 
@@ -297,4 +297,252 @@ public class MySubClass extends MyClass {
 ![hybrid inheritance](https://github.com/shubhamgupta2901/cheatsheets/blob/master/assets/hybrid%20inheritance.png)
 
 
+### Multiple Inheritance in JAVA
+
+* Multiple Inheritance is a feature of object oriented concept, where a class can inherit properties of more than one parent class. The problem occurs when there exist methods with same signature in both the super classes (and subclass). On calling the method, the compiler can not bind the method call to the method definition as there are more than one definition available. 
+
+#### Why multiple inheritance is not supported in java
+
+* Multiple inheritance is not supported in java to avoid ambiguity.
+
+* Consider a scenario where Parent1, Parent2, and Test are three classes. The Test class inherits Parent1 and Parent2 classes. If Parent1 and Parent2 classes have the same method and you call it from child class object, there will be ambiguity to call the method of Parent1 or Parent2 class.
+
+```java
+
+// First Parent class 
+class Parent1 
+{ 
+    void fun() 
+    { 
+        System.out.println("Parent1"); 
+    } 
+} 
+  
+// Second Parent Class 
+class Parent2 
+{ 
+    void fun() 
+    { 
+        System.out.println("Parent2"); 
+    } 
+} 
+  
+// Error : Test is inheriting from multiple 
+// classes 
+class Test extends Parent1, Parent2 
+{ 
+   public static void main(String args[]) 
+   { 
+       Test t = new Test(); 
+       t.fun(); 
+   } 
+} 
+```
+#### JAVA and Multiple Inheritance
+
+* Before Java 8, interfaces only had abstract methods. The implementation of these methods has to be provided in a separate class. So, if a new method is to be added in an interface, then its implementation code has to be provided in the class implementing the same interface. 
+
+* This way multiple inheritance could be achieved in JAVA through interfaces. Because even if a class is implementing two interfaces, and both the interfaces had same method, it will eventually need overriding it in the class, where its implementation can be provided. This would avoid the ambiguity and multiple inheritance could be achieved.
+
+* Although it should be noted that if two interfaces have **same method name, parameters and return type**, only one implementation of both the methods is allowed in child class.This is because if a class implements two interfaces, and each interface defines a method that has identical signature,name and return type, then in effect there is only one method, and they are not distinguishable. 
+
+```java
+public interface Accessible {
+    void sayHello();
+}
+```
+```java
+public interface Clickable {
+    void sayHello();
+}
+```
+
+```java
+public class Test implements Accessible, Clickable {
+    @Override
+    public void sayHello() {
+        System.out.println("Hello");
+
+    }
+
+    public static void main(String[] args) {
+        Test test = new Test();
+        test.sayHello();
+    }
+}
+
+```
+
+OUTPUT:
+```java
+Hello
+```
+
+* If the **method signature** of the two methods is different, child class will have to impelement both the methods separately:
+
+```java
+public interface Accessible {
+    void sayHello(String name);
+}
+```
+
+```java
+public interface Clickable {
+    void sayHello();
+}
+```
+
+```java
+public class Test implements Accessible, Clickable {
+    @Override
+    public void sayHello() {
+        System.out.println("Hello");
+    }
+
+    @Override
+    public void sayHello(String name) {
+        System.out.println("Hello "+  name);
+    }
+
+    public static void main(String[] args) {
+        Test test = new Test();
+        test.sayHello();
+        test.sayHello("Shubham");
+    }
+}
+```
+
+OUTPUT:
+```java
+Hello
+Hello Shubham
+```
+* However if we wish to implement two interfaces with same methods having **same signature but different return types**, **then it is impossible to implement both the interface simultaneously.**
+
+```java
+public interface Clickable {
+    int sayHello();
+}
+```
+
+```java
+public interface Accessible {
+    void sayHello();
+}
+```
+
+```java
+public class Test implements Accessible, Clickable {
+   @Override
+    public void sayHello() {
+
+    }
+
+    @Override
+    public int sayHello() {
+        return 0;
+    }
+}
+```
+
+* **Compiler would not allow us to do that.** Because it still does not solve the issue of ambiguity. When a method will be called, since both the methods have same signatures, it would not be possible to bind the method call to method definition.
+
+* With JAVA 8 however, new **default methods** have been introduced in interfaces. These methods are not abstract and have their default implementation in Interface only. If a class implementing the interface wants to override the definition of method provided in the interface, it is free to do so, otherwise a default implementation is already provided.
+
+* This allows us to add new methods to the interfaces without breaking the existing implementation of these interfaces and maintain backward compatibility.
+
+* So an interface with default method looks like this:
+
+```java
+public interface OldInterface {
+
+     void existingMethod();
+
+     default public void newDefaultMethod(){
+         System.out.println("New default method is added in interface.");
+     }
+
+}
+```
+
+```java
+public class OldInterfaceImplementation implements OldInterface {
+
+    @Override
+    public void existingMethod() {
+        System.out.println("Existing Method");
+    }
+
+    public static void main(String[] args) {
+        OldInterfaceImplementation impl = new OldInterfaceImplementation();
+        impl.existingMethod();
+        impl.newDefaultMethod();
+    }
+}
+```
+
+OUTPUT: 
+```java
+Existing Method
+New default method is added in interface.
+```
+* The question arises when we want to implement two interfaces in our class and both of them have a default method with same name and signature. How does JAVA avoid ambiguity in those cases.
+
+* **In case both the implemented interfaces contain deafult methods with same method signature, the implementing class must override the default method.** .While overriding either you can provide your own implementation, or use super keyword to use the implementation of one or both the interfaces.
+
+```java
+interface Accessible{
+	void access();
+
+	default void print(){
+		System.out.println("print from Accessible");
+	}
+}
+```
+
+```java
+interface Clickable{
+	void click();
+
+	default void print(){
+		System.out.println("Print from Clickable");
+	}
+}
+```
+
+```java
+public class Test implements Accessible,Clickable{
+    @Override
+    public void click() {
+
+    }
+
+    @Override
+    public void access() {
+
+    }
+
+    @Override
+    public void print() {
+        System.out.println("Print from Test");
+        Accessible.super.print();
+        Clickable.super.print();
+
+    }
+
+
+    public static void main(String[] args) {
+        Test test = new Test();
+        test.print();
+    }
+}
+```
+
+OUTPUT:
+
+```java
+Print from Test
+print from Accessible
+Print from Clickable
+```
 
