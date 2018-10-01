@@ -3,11 +3,10 @@
  * [Object creation of Sub Class](#object-creation-of-sub-class)
  * [Constructors of Sub and Super Classes](#constructors-of-sub-and-super-classes)
  * [Types of Inheritance](#types-of-inheritance)
+   * [Inheritance thorugh Classes](#inheritance-through-classes)
+   * [Addition Inheritance through Interfaces](#additional-interfaces-through-interfaces)
  
- 
- #### Types of Inheritance
- 
-* **Single Inheritance** : In single inheritance, subclasses inherit the features of one superclass. In image below, the class A serves as a base class for the derived class B.
+
 
  ------------------------------------------------------------------------------------------------------------------------
   
@@ -16,6 +15,8 @@
 * Inheritance is one of the important concepts in OOPS. It is a mechanism which allows one class to inherit the features of another class.
 
 * Inheritance supports the concept of **reusability**, i.e. when we want to create a new class and there is already a class that includes some of the code that we want, we can derive our new class from the existing class. By doing this, we are reusing the fields and methods of the existing class.
+
+* Another reason to use Inheritance is to achieve **run time polymorphism** by method overriding.
 
 * **Super Class**: The class whose features are inherited is known as super class(or a base class or a parent class).
 
@@ -268,7 +269,32 @@ public class MySubClass extends MyClass {
         super(c);  // COMPILE ERROR
     }
 }
+```
+ ### Types of Inheritance
+ 
+ #### Inheritance thorugh Classes
+ 
+* **Single Inheritance** : In single inheritance, subclasses inherit the features of one superclass. In image below, the class A serves as a base class for the derived class B.
 
+![single inheritance](https://github.com/shubhamgupta2901/cheatsheets/blob/master/assets/single%20inheritance.png)
+
+* **Multilevel Inheritance**: In Multilevel Inheritance, a class inherits features of a another class which itself has In below image, the class A serves as a base class for the derived class B, which in turn serves as a base class for the derived class C. In Java, a class cannot directly access the grandparent’s members.
+
+![multilevel Inheritance](https://github.com/shubhamgupta2901/cheatsheets/blob/master/assets/multilevel%20inheritance.png)
+
+* **Hierarchical Inheritance**: In Hierarchical Inheritance, one class serves as a superclass (base class) for more than one sub class.In below image, the class A serves as a base class for the derived class B,C and D.
+
+![hierarchical inheritance](https://github.com/shubhamgupta2901/cheatsheets/blob/master/assets/heirarchial%20inheritance.png)
+
+#### Addition Inheritance through Interfaces
+
+* **Multiple Inheritance**:  In Multiple inheritance ,one class can have more than one superclass and inherit features from all parent classes. Please note that Java does not support multiple inheritance with classes. In java, we can achieve multiple inheritance only through Interfaces. In image below, Class C is derived from interface A and B.
+
+![multiple inheritance](https://github.com/shubhamgupta2901/cheatsheets/blob/master/assets/multiple%20inheritance.png)
+
+* **Hybrid Inheritance**: It is a mix of two or more of the above types of inheritance. Since java doesn’t support multiple inheritance with classes, the hybrid inheritance is also not possible with classes. In java, we can achieve hybrid inheritance only through Interfaces.
+
+![hybrid inheritance](https://github.com/shubhamgupta2901/cheatsheets/blob/master/assets/hybrid%20inheritance.png)
 
 
 
