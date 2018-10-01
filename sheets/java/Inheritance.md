@@ -1,6 +1,7 @@
 ### Contents
-  * Inheritance
+ * [Inheritance](#inheritance)
   
+### Inheritance
 
 * Inheritance is one of the important concepts in OOPS. It is a mechanism which allows one class to inherit the features of another class.
 
@@ -11,3 +12,12 @@
 * **Sub Class**: The class that inherits the other class is known as sub class(or a derived class, extended class, or child class). The subclass can add its own fields and methods in addition to the superclass fields and methods.
 
 * The keyword used for inheritance is **```extends```**.
+
+```java
+class child-class extends parent-class  
+{  
+   //methods and fields  
+}  
+```
+
+* 
