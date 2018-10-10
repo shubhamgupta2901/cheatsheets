@@ -1,11 +1,12 @@
-#### Contents
-* [Direct Access Table](#direct-access-table)
-* [Prehashing](#prehashing)
-* [Hashing](#hashing)
-* [Collision](#collision)
-* [Chaining](#chaining)
-* [Analysis](#analysis)
-* [Basic Implementation](#basic-implementation)
+### Contents
+ * [Direct Access Table](#direct-access-table)
+ * [Prehashing](#prehashing)
+ * [Hashing](#hashing)
+ * [Collision](#collision)
+ * [Chaining](#chaining)
+ * [Analysis](#analysis)
+ * [Basic Implementation](#basic-implementation)
+ * [hashCode and equals method in JAVA](#hashcode-and-equals-method-in-java)
   
 * Hashmap is a data-structure that stores the data in key-value pairs. 
 
@@ -314,4 +315,97 @@ Replacing value of existing key: d with value: 100
 KEY: d | VALUE:  100
 Removing all keys from hashmap
 Size of map after removing all keys: 0
+```
+#### hashCode and equals method in JAVA
+
+* In Java ```equals()``` and ```hashCode()``` methods are present in the ```java.lang.Object``` class.
+
+* The iternal implemenatation of Hashmap uses ```hashCode()``` to generate an integer value corresponding to an object (this object is key in the Hashmap). This is prehashing. Once this hashCode is generated, using the internal implementation of ```hash()``` (which is actual hashing) this hashcode is mapped to a index of a bucket in the Hashmap. 
+
+* Whenever ```hashCode()``` is invoked on the same object more than once during an execution of a Java application,  the ```hashCode()``` must consistently return the same integer. This integer need not remain consistent from one execution of an application to another execution of the same application.
+
+* ```equals()``` method is generally used to compare the logical equivalance of two objects. The default implementation of ```equals()``` in ```Object``` class checks if the object references of the two objects being compared are equal, that is if both the objects being compared are the exact same object.(both the references of objects point to same memory location in heap)
+
+* In the internal implementation of  Hashmap ```equals()``` method is used to find if such a key already exists in that bucket, if not found then a new key-value pair is created and is stored in the same bucket. If however, the key is found then the value associated with this key is simply replaced.
+
+* An important point to keep in mind in the contract of hashCode is: **If two objects are equal according to the ```equals(Object)``` method, then calling the  ```hashCode()``` method on each of  the two objects must produce the same integer result.** (However it is *NOT* required that if two objects are unequal according to the ```java.lang.Object#equals(java.lang.Object)```method, then calling the ```hashCode()``` method on each of the two objects must produce distinct integer results.) 
+
+* As long as we use the default implementation of these two methods in a class, everything works fine. However it requires special attention when we want to override  ```equals()``` (to establish a specific logical equivalence) in a class whose objects we intend to use as a key for a HashMap. 
+
+* If two objects which return true when we call ```obj1.equals(obj2)``` or ```obj2.equals(obj1)``` and still return different hashCodes on calling ```obj1.hashCode()``` or ```obj2.hashCode()```. Then using Hashmap with these objects as key would create issues. Like the following example:
+
+```java
+public final class CreditCard {
+    private final int number;
+
+    public CreditCard(int number) {
+        this.number = number;
+    }
+
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof CreditCard)) {
+            return false;
+        }
+        CreditCard cc = (CreditCard) o;
+        return cc.number == number;
+    }
+
+    public static void main(String[] args) {
+        java.util.Map<CreditCard, String> m = new java.util.HashMap<CreditCard, String>();
+        m.put(new CreditCard(100), "4111111111111111");
+        System.out.println(m.get(new CreditCard(100)));
+    }
+}
+```
+
+OUTPUT:
+
+```java
+null
+```
+* The cause of this erroneous behavior is that the ```CreditCard``` class overrides the ```equals()``` method but fails to override the ```hashCode()``` method. Consequently, the default ```hashCode()``` method returns a different value for each object, even though the objects are logically equivalent; these differing values lead to examination of different buckets in the HashMap, which prevents the ```get()``` method from finding the intended value.
+
+* Therefore **it is generally necessary that classes that override the ```Object.equals()``` method also  override the ```Object.hashCode()``` method.** The ```java.lang.Object``` class requires that any two objects that compare equal using the ```equals()``` method must produce the same integer result when the ```hashCode()``` method is invoked on the objects.
+
+* A solution to above code looks like this: 
+
+```java
+public final class CreditCard {
+  private final int number;
+   
+  public CreditCard(int number) {
+    this.number = number;
+  }
+ 
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (!(o instanceof CreditCard)) {
+      return false;
+    }
+    CreditCard cc = (CreditCard)o;
+    return cc.number == number;
+  }
+ 
+  public int hashCode() {
+    int result = 17;
+    result = 31 * result + number;
+    return result;
+  }
+ 
+  public static void main(String[] args) {
+    Map<CreditCard, String> m = new HashMap<CreditCard, String>();
+    m.put(new CreditCard(100), "4111111111111111");
+    System.out.println(m.get(new CreditCard(100)));
+  }
+}
+```
+OUTPUT:
+
+```java
+4111111111111111
 ```
