@@ -1,6 +1,11 @@
 #### Contents
-  *
-  
+* [Direct Access Table](#direct-access-table)
+* [Prehashing](#prehashing)
+* [Hashing](#hashing)
+* [Collision](#collision)
+* [Chaining](#chaining)
+* [Analysis](#analysis)
+* [Basic Implementation](#basic-implementation)
   
 * Hashmap is a data-structure that stores the data in key-value pairs. 
 
@@ -9,7 +14,7 @@
 * Time complexity of both functions is O(1).
 
 
-### Direct Access Table
+#### Direct Access Table
 
 * One simple approach would be to implement such a data structure would be by using array to keep values. This is called **Direct Access Table**. 
 * Here index of the array will be the key.
@@ -19,7 +24,7 @@
   1. **Keys can be any data type**: It will be hard to associate every key with an integer.
   2. **Gigantic memory hog**: If the set of possible keys will be very large, we will have to create a really big array, occupying more space.
   
-  ### Prehashing
+#### Prehashing
   
 * Soultion to keys may not be integers: Map the keys non-negative integers to keep them in Direct Access Table. This is called 
 **Prehashing**. (This can be done because every object can be written down as array of bits which is a string).
@@ -28,7 +33,7 @@
  
  * Prehash function should not change values overtime. Suppose if you have an item which we wish to put in the hashmap. We compute the hash prehash of the key and then we put the item in the direct access tabl with index with prehash(key). And we want to search for that item in the table, and we call prehash(key) to get the index of the table in which the item is kept, Now if the value of prehash(key) change, we can not find the item.
  
- ### Hashing
+#### Hashing
 
 * This is solution to gigantic size of the Direct Access Table. With hashing we will try to reduce the universe of all keys down to reasonable size for the table.
 
@@ -70,4 +75,243 @@
   * For cases when the loadFactor < 1. When the size of table(number of buckets) is larger than number of keys: O(1)
   * For cases when the loadFactor >= 1. O(loadFactor) or constant time.
   
-### Implementation
+###  Basic Implementation
+
+* Here is a basic implementation of a Hashmap which takes String keys and Object values. This is not thread safe.
+
+* The HashMap has following methods:
+
+```java
+public interface Map {
+
+    int size();
+
+    void put(String key, Object value);
+
+    Object get(String key);
+
+    void remove(String key);
+
+}
+```
+
+```java
+package playground.hashmap;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by shubham on 10/10/18
+ */
+public class HashMap implements Map {
+
+    class Pair {
+        private String key;
+        private Object value;
+
+        public Pair(String key, Object value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private List<Pair>[] buckets;
+    private int capacity;
+    private int size;
+
+    public HashMap(int capacity) {
+        this.capacity = capacity;
+        this.buckets = new List[capacity];
+        this.size = 0;
+    }
+
+    /**
+     * Hashcode of a key is a prehash. This will covert the object into array of bits, which is essentially an integer.
+     * But since the set of possible hashcodes is very large, Using this function we would like to map these possible hashcodes to
+     * a smaller set which is the capacity of this hashmap.
+     * Good hash functions uniformly distribute the keys, in hashmap and most of the list in indices of buckets will have same length.
+     * For the demonstration purposes we are simply taking the modulo of hashcode to the capacity of hashmap.
+     *
+     * @param key
+     * @return
+     */
+    private int hash(String key) {
+        return key.hashCode() % capacity;
+    }
+
+    /**
+     * Returns the number of key-value mappings in this map.
+     *
+     * @return
+     */
+    @Override
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Associates the specified value with the specified key in this map.
+     * If the key is already associated with a value, replace it
+     *
+     * @param key
+     * @param value
+     */
+    @Override
+    public void put(String key, Object value) {
+        int index = hash(key);
+        List<Pair> list;
+
+        list = buckets[index];
+        //If no Pair has been inserted in this index of buckets, create a new list
+        if (list == null) {
+            list = new ArrayList<>();
+            list.add(new Pair(key, value));
+            buckets[index] = list;
+            size++;
+        }
+        //  A list of Pairs already exist in this index of buckets
+        else {
+            //Checking if the key already exists in the buckets, In this case we will have to replace the value.
+            boolean found = false;
+            for (Pair pair : list) {
+                if (key.equals(pair.key)) {
+                    pair.value = value;
+                    found = true;
+                    break;
+                }
+
+            }
+            // The key does not exist in this index of buckets(Essentially, its not in the HashMap), Append a new Pair in the list
+            if (!found) {
+                list.add(new Pair(key, value));
+                size++;
+            }
+
+        }
+
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
+     *
+     * @param key
+     * @return
+     */
+    @Override
+    public Object get(String key) {
+        int index = hash(key);
+        //If there is no list in this index of buckets, return null
+        List<Pair> list = buckets[index];
+        if (list == null)
+            return null;
+
+        // If the list exists, find the Pair with given key
+        for (Pair pair : list) {
+            if (key.equals(pair.key))
+                return pair.value;
+        }
+
+        return null;
+    }
+
+    /**
+     * Removes the mapping for the specified key from this map if present.
+     *
+     * @param key
+     */
+    @Override
+    public void remove(String key) {
+        int index = hash(key);
+        List<Pair> list = buckets[index];
+        //There is no list at the index of the buckets
+        if (list == null)
+            return;
+
+        //Could not use this code due to ConcurrentModificationException which occurs when we try to modify a list while using an iterator. For each loop uses an iterator inside.
+        /*for(Pair pair: list){
+            if(pair.key.equals(key)){
+                list.remove(pair);
+                    size--;
+
+            }
+        }*/
+        // If the list contains the pair with given key, remove it.
+        for (int i = 0; i < list.size(); i++) {
+            Pair pair = list.get(i);
+            if (pair.key.equals(key)) {
+                list.remove(key);
+                size--;
+                break;
+            }
+        }
+    }
+
+}
+```
+
+* Here is this being is use:
+
+```java
+public class Driver {
+
+    public static void main(String[] args) {
+        HashMap map = new HashMap(4);
+
+        String key;
+        int value;
+
+        System.out.println("Adding 10 key value pairs");
+        for(int i = 0; i<10; i++){
+            char c = (char) ('a'+i);
+            key = Character.toString(c);
+            map.put(key,i);
+        }
+
+        System.out.println("Reading key value pairs from map");
+        for (int i =0; i<10; i++){
+            char c = (char) ('a'+i);
+            key = Character.toString(c);
+            value = (int)map.get(key);
+            System.out.println("KEY: "+ key+ " | VALUE:  "+value);
+        }
+
+        key = "d";
+        value = 100;
+
+        System.out.println("Replacing value of existing key: "+ key + " with value: "+ value);
+        map.put(key,value);
+        System.out.println("KEY: "+ key+ " | VALUE:  "+value);
+
+        System.out.println("Removing all keys from hashmap");
+        for (int i =0; i<10; i++){
+            char c = (char) ('a'+i);
+            key = Character.toString(c);
+            map.remove(key);
+        }
+
+        System.out.println("Size of map after removing all keys: " + map.size());
+
+    }
+}
+```
+
+OUTPUT: 
+```java
+Adding 10 key value pairs
+Reading key value pairs from map
+KEY: a | VALUE:  0
+KEY: b | VALUE:  1
+KEY: c | VALUE:  2
+KEY: d | VALUE:  3
+KEY: e | VALUE:  4
+KEY: f | VALUE:  5
+KEY: g | VALUE:  6
+KEY: h | VALUE:  7
+KEY: i | VALUE:  8
+KEY: j | VALUE:  9
+Replacing value of existing key: d with value: 100
+KEY: d | VALUE:  100
+Removing all keys from hashmap
+Size of map after removing all keys: 0
+```
