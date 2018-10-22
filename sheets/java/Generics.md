@@ -1,5 +1,6 @@
  ### Contents
- * [Generic Class](#generic-class)
+ * [Generic Classes](#generic-class)
+ * [Multiple Type Parameters](#multiple-type-parameters)
  * [Generic Methods](#generic-methods)
  * [Bounded Type Parameters](#bounded-type-parameters)
  * [Unbounded Wildcards](#unbounded-wildcards)
@@ -39,7 +40,130 @@
 3. *Enabling programmers to implement generic algorithms*: By using generics, programmers can implement generic algorithms that work on collections of different types, can be customized, and are type safe and easier to read.
     
    
+#### Generic Classes
+
+* Consider a ```Box``` class that operates on objects of any type. It needs only to provide two methods: ```set()```, which adds an object to the box, and ```get()```, which retrieves it: 
+
+```java
+public class Box {
+    private Object object;
+
+    public void set(Object object) { this.object = object; }
+    public Object get() { return object; }
+}
+```
+
+* Since its methods accept or return an Object, we are free to pass in whatever you want, provided that it is not one of the primitive types. There is no way to verify, at compile time, how the class is used. One part of the code may place an ```Integer``` in the box and expect to get ```Strings``` out of it resulting in a runtime error.
+
+* Something like this:
+
+```java
+public static void main(String[] args) {
+      Box box = new Box();
+      box.setItem(10);
+      String s = (String) box.getItem();
+      System.out.println(s);
+   }
+```
+* This will generate the following error:
+```Exception in thread "main" java.lang.ClassCastException: java.base/java.lang.Integer cannot be cast to java.base/java.lang.String```
+
+* We can use generic class instead, with the following syntax:
+
+```java
+class name<T1, T2, ..., Tn> { /* ... */ }
+```
+
+* To update the Box class to use generics, you create a generic type declaration by changing the code ```public class Box``` to ```public class Box<T>```. This introduces the type variable, ```T```, that can be used anywhere inside the class.
+
+```java
+public class Box<T> {
+
+    private T item;
     
+    public void setItem(T item) {
+        this.item = item;
+    }
+
+    public T getItem() {
+        return this.item;
+    }
+}
+```
+
+* A type variable can be any non-primitive type you specify: any class type, any interface type, any array type, or even another type variable.This same technique can be applied to create generic interfaces.
+
+* It can be used in the following way:
+
+```java
+public class App {
+
+    public static void main(String[] args) {
+      Box<Integer> integerBox = new Box<>();
+      integerBox.setItem(10);
+      Integer integerItem = integerBox.getItem();
+      System.out.println(integerItem);
+
+      Box<String> stringBox = new Box<>();
+      stringBox.setItem("Shubham");
+      String stringItem = stringBox.getItem();
+      System.out.println(stringItem);
+    }
+}
+```
+OUTPUT:
+```java
+10
+Shubham
+```
+
+* Although the object of ```Box``` should be instantiated the following way:
+
+```java
+ Box<Integer> integerBox = new Box<Integer>();
+ ```
+but since Java SE 7 and later, we can replace the type arguments required to invoke the constructor of a generic class with an empty set of type arguments (<>) as long as the compiler can determine, or infer, the type arguments from the context. For example, you can create an instance of Box<Integer> with the following statement:
+
+```java
+Box<Integer> integerBox = new Box<>();
+```
+This is called **Type Inference**.
+
+#### Multiple Type Parameters
+
+*  A generic class can have multiple type parameters. Something like this: 
+
+```java
+public interface Pair<K,V> {
+    K getKey();
+    V getValue();
+}
+```
+
+```java
+public class OrderedPair<K,V> implements Pair<K,V> {
+
+    private  K key;
+    private  V value;
+
+    public OrderedPair(K key, V value){
+        this.key = key;
+        this.value = value;
+    }
+
+    @Override
+    public K getKey() {
+        return key;
+    }
+
+    @Override
+    public V getValue() {
+        return value;
+    }
+}
+```
+
+* 
 
 
   
