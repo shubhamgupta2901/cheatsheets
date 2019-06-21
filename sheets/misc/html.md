@@ -33,6 +33,29 @@
 
 * Comments in HTML can be written like ```<!-- Comment here-->```
 
+*  The HTML Content Division element (```<div>```) is the generic container for flow content. It has no effect on the content or layout until styled using CSS:
 
+```HTML
+<div class="warning">
+    <img src="/media/examples/leopard.jpg"
+         alt="An intimidating leopard.">
+    <p>Beware of the leopard</p>
+</div>
+```
 
+* The HTML ```<span>``` element is a generic inline container for phrasing content, which does not inherently represent anything. It can be used to group elements for styling purposes (using the class or id attributes), or because they share attribute values, such as lang.```<span>``` is very much like a ```<div>``` element, but ```<div>``` is a **block-level** element whereas a ```<span>``` is an **inline element**.
 
+```HTML
+<p>Add the <span class="ingredient">basil</span>, <span class="ingredient">pine nuts</span> and <span class="ingredient">garlic</span> to a blender and blend into a paste.</p>
+
+<p>Gradually add the <span class="ingredient">olive oil</span> while running the blender slowly.</p>
+```
+
+* A block-level element always starts on a new line and takes up the full width available (stretches out to the left and right as far as it can). Block-level elements may appear only within a ```<body>``` element.
+
+* An inline element does not start on a new line and only takes up as much width as necessary.
+
+* **Attributes**: Elements in HTML have attributes; these are additional values that configure the elements or adjust their behavior in various ways to meet the criteria the users want. They bascially take the form of a key-value pair:
+```HTML
+<tag attribute-name='attribute-value'></tag>
+```
