@@ -113,3 +113,33 @@ ul li a{
     property: value;
 }
 ```
+
+* Adjacent Selector:
+```css
+/*It will let us select element that come after another element on the same level. i.e. it allows us to select a sibling 
+Following will select all the ul that are siblings to h4.*/
+h4+ul{
+    border: 4px solid red;
+}
+```
+
+* Attribute selector: 
+```css
+/*This will select all the anchor tags with the attribute href having value "https://www.google.comx"*/
+a[href="https://www.google.com"]{
+    background: blue;
+}
+
+/*selects all inputs with attribute type is text*/
+input[type="text"]{
+
+}
+```
+
+* nth of type
+```css
+/*Selects the nth type of element in a page. This will select the 3rd ul element present in the page.*/
+ul:nth-of-type(3){
+    background: purple;
+}
+```
