@@ -72,3 +72,44 @@ selector{
 * HTML is meant for conveying structured information. CSS is built to style that structured information. When inline styles are used, this clear separation between structured information and styling is blurred. By separating the CSS from the HTML, the markup can be semantic, which means that it can convey as much meaning as possible without being muddled by visual effects.
 
 * Also, because inline styles only affect the tag they are written in, it can be hard to make changes. So for example, if you have written the same style 20 times in 20 different ```<div>``` tags, you must edit each of those places whenever you want to make a trivial change. This can be exhausting! By using a single CSS rule in a ```<style>``` tag or a separate CSS file, you would only need to change it in one place.
+
+#### CSS Selectors REF: [30 selectors](https://code.tutsplus.com/tutorials/the-30-css-selectors-you-must-memorize--net-16048)
+* Element: selects all the elements with ```element-name```
+```css
+element-name{
+    property:value;
+}
+```
+
+* Class: selects all the elements with class ```class-name```
+```css
+#class-name{
+    property: value;
+}
+```
+
+* ID: Selects the html element with id ```id```
+```css
+.id{
+    property: value;
+}
+```
+
+* Star: Selects every single element in the html.
+```css
+*{
+    property: value;
+}
+```
+
+* Descendant: It takes two or more tagnames or two or more selectors and tries to find the 
+```css
+/*This style will be implemented on all the anchor tags which are inside the li tags i.e. anchors whose parent is li tag*/
+li a{
+    property: value;
+}
+/*Similar to above selector, Syntactically correct; but redundant because li appears only inside ul*/
+ul li a{
+    property: value;
+}
+```
