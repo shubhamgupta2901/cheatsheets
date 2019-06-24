@@ -83,14 +83,14 @@ element-name{
 
 * Class: selects all the elements with class ```class-name```
 ```css
-#class-name{
+.class-name{
     property: value;
 }
 ```
 
 * ID: Selects the html element with id ```id```
 ```css
-.id{
+#id{
     property: value;
 }
 ```
@@ -143,3 +143,62 @@ ul:nth-of-type(3){
     background: purple;
 }
 ```
+
+#### Specificity
+
+* Specificity is the means by which browsers decide which CSS property values are the most relevant to an element and, therefore, will be applied. 
+
+Eg. 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Specificity</title>
+    <style>
+        body{
+            color: blueviolet
+        }
+        ul{
+            color: goldenrod;
+        } 
+        li{
+            color: brown;
+
+        }
+        .highlight{
+            color: green;
+        }
+        #special{
+            color:red;
+        }
+    </style>
+</head>
+<body>
+    <p>Hello!</p>
+    <ul>
+        <li id="special" class="highlight">Woody</li>
+        <li>Buzz Lightyear</li>
+        <li>Bonnie</li>
+        <li class="highlight">Forky</li>
+    </ul>
+    
+</body>
+</html>
+```
+PREVIEW:
+![specificity](https://github.com/shubhamgupta2901/cheatsheets/blob/master/assets/css-specificity.png '')
+
+* How is specificity calculated?
+    * Specificity only applies when the same element is targeted by multiple declarations.
+    * directly targeted elements will always take precedence over rules which an element inherits from its ancestor.
+    * When multiple declarations have equal specificity, the last declaration found in the CSS is applied to the element. 
+    * Inline styles added to an element (e.g., style="font-weight: bold;") always overwrite any styles in external stylesheets, and thus can be thought of as having the highest specificity.
+
+* The following list of selector types increases by specificity:
+    * Type selectors (e.g., h1)
+    * Class selectors (e.g., .example), attributes selectors (e.g., [type="radio"]) 
+    *  ID selectors (e.g., #example).
