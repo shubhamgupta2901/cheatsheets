@@ -60,12 +60,15 @@ Heaps and Binary Heaps
 
 
 Types of Heaps:
+```
     Min Heap: The value of node must be less than or equal to the values of its children.
+    
                           11
                         /    \
                       15     12
                      /  \    /  \
                     16   17  14  13
+    
     Max Heap: The value of node must be greater than or equal to the value of its children.
                           17
                         /    \
@@ -83,7 +86,7 @@ Representation of Heaps:
                                 1   4   2    5
 
         to array: {17, 13, 6, 1, 4, 2, 5}
-
+```
 
 
 
