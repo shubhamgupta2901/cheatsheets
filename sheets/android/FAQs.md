@@ -77,3 +77,74 @@ Types of services:
     * A client component may or may not be bound to the hybrid service. 
     * A hybrid service will keep running until it is explicitly told to stop, or until there are no more clients bound to it.
     * For example: A music player might find it useful to allow its service to run indefinitely and also provide binding. This way, an activity can start the service to play some music and the music continues to play even if the user leaves the application. Then, when the user returns to the application, the activity can bind to the service to regain control of playback.
+
+
+**Broadcast Receivers**
+1. Broadcast receivers are components that allows the app to register for system level and application level events.
+2. Events can either be system level or can be created by us. like: 
+```java
+      Intent intent = new Intent();
+      intent.setAction("com.journaldev.CUSTOM_INTENT");
+      sendBroadcast(intent);
+```
+3. If the event for which the broadcast receiver has registered happens, the onReceive() method of the receiver is called by the Android system.
+4. For example, we can register a broadcast receiver for ACTION_BOOT_COMPLETED, SMS_RECEIVED system event, so whenever the device is restarted, the system will broadcast the event, and we can recieve it in our app, and take action accordingly.
+3. We can register a reciever via the AndroidManifest file or programmatically using Context.registerReceiver() method.
+4.After the onReceive() of the receiver class has finished, the Android system is allowed to recycle the receiver.
+5. Before API level 11, you could not perform any asynchronous operation in the onReceive() method, because once the onReceive() method had been finished, the Android system was allowed to recycle that component. If you have potentially long running operations, you should trigger a service instead. Since Android API 11 you can call the ```goAsync()``` method. 
+6. **```goAsync()```**: We can use ```goAsync()``` to handoff the processing inside of your BroadcastReceiver's ```onReceive()``` method to another thread. The onReceive() method can then be finished there. The PendingResult is passed to the new thread and you have to call PendingResult.finish() to actually inform the system that this receiver can be recycled.
+  
+  ```
+  final PendingResult result = goAsync();
+Thread thread = new Thread() {
+   public void run() {
+      int i;
+      // Do processing
+      result.setResultCode(i);
+      result.finish();
+   }
+};
+thread.start();
+  ```
+* This method returns an object of the PendingResult type. The Android system considers the receiver as alive until you call the PendingResult.finish() on this object. As soon as that thread has completed, its task calls finish() to indicate to the Android system that this component can be recycled.
+
+
+Creating a broadcast receiver:
+```
+public class MyReceiver extends BroadcastReceiver {
+    public MyReceiver() {
+    }
+ 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      
+        Toast.makeText(context, "Action: " + intent.getAction(), Toast.LENGTH_SHORT).show();
+    }
+}
+```
+
+Registering the BroadcastReceiver in AndroidManifest.xml: 
+```
+<receiver android:name=".ConnectionReceiver" >
+             <intent-filter>
+                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+             </intent-filter>
+</receiver>
+```
+
+Registering Broadcast receiver programmatically:
+```
+IntentFilter filter = new IntentFilter();
+intentFilter.addAction(getPackageName() + "android.net.conn.CONNECTIVITY_CHANGE");
+ 
+MyReceiver myReceiver = new MyReceiver();
+registerReceiver(myReceiver, filter);
+```
+
+Broadcasting custom event from app:
+```
+      Intent intent = new Intent();
+      intent.setAction("com.journaldev.CUSTOM_INTENT");
+      sendBroadcast(intent);
+```
+
