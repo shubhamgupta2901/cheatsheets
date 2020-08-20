@@ -164,4 +164,10 @@ Implicit Broadcast Receivers aren’t exclusive to your application. Actions suc
 
  * Since Android Oreo, implicit broadcast receivers won’t work when registered in the AndroidManifest.xml. To use Implicit Receivers in your application, you need to define them programmatically in your code, using registerReceiver().
  * Using registerReceiver() we can programmatically register and unregisterReceiver() during the lifecycle of the activity. This way implicit receivers would only be called when our activity/application is alive and not at other times. Several Implicit Broadcasts are exempted and can be declared in the Manifest.
+ 
+ **Content Providers**
+ 
+ * Content providers is the mechanism through which one app in android can access data from anther application.
+ * Through the content provider, other apps can query or modify the data if the content provider allows it. 
+ * For example, the Android system provides a content provider that manages the user's contact information. As such, any app with the proper permissions can query the content provider, to read and write information about a particular person.
 
