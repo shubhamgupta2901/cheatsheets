@@ -148,3 +148,20 @@ Broadcasting custom event from app:
       sendBroadcast(intent);
 ```
 
+* Difference between registering broadcast receiver in Android Manifest vs registering them programmatically: When we declare Broadcast receivers programmatically, the broadcast are bound with the application. So when the application gets destroyed, the onRecive() method would not be called. Whereas if we register them in AndroidManifest, we onRecieve is called even when the application is not alive.
+
+* Explicit and Implicit Broadcast receivers: 
+
+Explicit Intents are used to call a particular component that you know of.
+Implicit Intents are used when you don’t know the exact component to invoke.
+
+Similarly, 
+
+Explicit Broadcast Receivers are exclusive to your application. Only your application’s broadcast receiver will get triggered when the custom intent action you define, gets called.
+Implicit Broadcast Receivers aren’t exclusive to your application. Actions such as ACTION_BOOT_COMPLETED or CONNECTIVITY_CHANGE are categorised in implicit broadcast receivers. This is because when these events happen, all the applications registered with the event will get the information.
+
+* Handling Android Oreo Broadcast Receivers: 
+
+ * Since Android Oreo, implicit broadcast receivers won’t work when registered in the AndroidManifest.xml. To use Implicit Receivers in your application, you need to define them programmatically in your code, using registerReceiver().
+ * Using registerReceiver() we can programmatically register and unregisterReceiver() during the lifecycle of the activity. This way implicit receivers would only be called when our activity/application is alive and not at other times. Several Implicit Broadcasts are exempted and can be declared in the Manifest.
+
