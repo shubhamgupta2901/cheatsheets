@@ -1,7 +1,11 @@
 ## Contents
 * [Android Lifecycles](#activity-lifecycle)
    * [Activity Lifecycle](#activity-lifecycle)
-   * [Scenario 1: Single Activity Lifecycle](#scenario1)
+   * [Lifecycle Scenarios](#lifecycle-scenarios)
+      * [Single Activity](#single-activity)
+      * [Multiple Activities](#multiple-activities)
+      * [Fragments](#multiple-activities)
+      * [ViewModels, Translucent Activities and Launch Modes](#view-models-translucent-activities-launch-modes)
 * [Difference between onCreate and onStart](#difference-between-oncreate-and-onstart)
 * [Scenario where onDestroy is called without onPause or onStop](#scenario-where-onDestroy-is-called-without-onPause-or-onStop)
 * [Configuration Changes](#configuration-changes)
@@ -90,18 +94,61 @@ But if the 1. system had closed the process on which this acitivity resided, or 
 
 * The ```onDestroy()``` callback should release all resources that have not yet been released by earlier callbacks such as ```onStop()```.
 
-### [Scenario 1: Single Activity Lifecycle](#scenario1)
+### [Lifecycle Scenarios](#lifecycle-scenarios)
 
-**Single-activity application is started, finished and restarted by the user:** 
+#### [Single Activity](#single-activity)
+
+##### Single-activity application: application started, finished and restarted by the user:
 
 * Triggered by:
    * The user presses the Back button, or
    * The Activity.finish() method is called
-
 ![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_2.png)
 * Managing State:
    * onSaveInstanceState is not called (since the activity is finished, you don’t need to save state)
    * onCreate doesn’t have a Bundle when the app is reopened, because the activity was finished and the state doesn’t need to be restored.
+   
+##### Single-activity application: User navigates away from application
+* Triggered by:
+   * The user presses the Home button
+   * The user switches to another app (via Overview menu, from a notification, accepting a call, etc.)
+
+In this scenario the system will stop the activity, but won’t immediately finish it.
+
+![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_3.png)
+* Managing State:
+   * onSaveInstanceState is called, system uses onSaveInstanceState to save the app state in case the system kills the app’s process later on (see below).
+   * If the process isn’t killed, the activity instance is kept resident in memory, retaining all state. When the activity comes back to the foreground, the activity recalls this information. You don’t need to re-initialize components that were created earlier.
+
+##### Single-activity application: Configuration changes
+* Triggered by:
+  * Configuration changes, like a rotation, language change
+  * User resizes the window in multi-window mode
+
+![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_4.png)
+
+* Managing State:
+  * The activity is completely destroyed, but the state is saved and restored for the new instance.
+  * The Bundle in onCreate and onRestoreInstanceState is the same.
+  
+##### Single-activity application: App is paused by the system
+* Triggered by:
+  * Enabling Multi-window mode (API 24+) and losing the focus
+  * Another app partially covers the running app (a purchase dialog, a runtime permission dialog, a third-party login dialog…)
+  * An intent chooser appears, such as a share dialog
+
+![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_5.png)
+
+* This scenario doesn’t apply to:
+  * Dialogs in the same app. Showing an AlertDialog or a DialogFragment won’t pause the underlying activity.
+  * Notifications. User receiving a new notification or pulling down the notification bar won’t pause the underlying activity.
+  
+#### [Multiple Activities](#multiple-activities)
+#### [Fragments](#multiple-activities)
+#### [ViewModels, Translucent Activities and Launch Modes](#view-models-translucent-activities-launch-modes)
+
+
+
 
 #### Launch Modes
 
