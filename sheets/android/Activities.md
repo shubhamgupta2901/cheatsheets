@@ -146,7 +146,37 @@ In this scenario the system will stop the activity, but won’t immediately fini
   * Notifications. User receiving a new notification or pulling down the notification bar won’t pause the underlying activity.
   
 #### [Multiple Activities](#multiple-activities)
-#### [Fragments](#multiple-activities)
+Note: Grouped events that appear side by side run in parallel, so the order of calls among parallel groups of events is not guaranteed. However, order inside a group is guaranteed.
+
+#### Navigating between activities
+
+* Scenario: Activity1 starts, it starts Activity2, then we press back button on Activity2.
+* When a new activity is started, Activity2 is STOPPED (but not destroyed), after that when the Back button is pressed, Activity2 is destroyed and finished.
+
+![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_6.png)
+
+* Managing state
+  * **onSaveInstanceState is called, but onRestoreInstanceState is not**. This is because if there is a configuration change when the second activity is active, the first activity will be destroyed and recreated only when it’s back in focus. That’s why saving an instance of the state is important. If the system kills the app process to save resources, this is another scenario in which the state needs to be restored.
+  
+#### Multiple Activities: Activities in the back stack with configuration changes
+
+* Scenario: Activity1 starts, it starts Activity2. When on Activity2, the device is rotated.
+
+![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_7.png)
+
+* Managing state
+  * Saving state is not only important for the activity in the foreground. All activities in the stack need to restore state after a configuration change to recreate their UI. Also, the system can kill your app’s process at almost any time so you should be prepared to restore state in any situation.
+
+#### Multiple Activities: App’s process is killed
+
+* Scenario: Activity1 starts -> it starts Activity2 -> App goes on Background -> Android System kills in background -> App comes to foreground -> Back pressed from Activity 2 
+
+![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_8.png)
+
+* Managing state
+  * Note that the state of the full back stack is saved but, in order to efficiently use resources, activities are only restored when they are recreated.
+
+#### [Fragments](#fragments)
 #### [ViewModels, Translucent Activities and Launch Modes](#view-models-translucent-activities-launch-modes)
 
 
