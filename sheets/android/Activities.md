@@ -55,12 +55,12 @@ But if the 1. system had closed the process on which this acitivity resided, or 
 
 ##### ```onPause()```
 * The system calls this method when the activity is no longer in foreground, or has lost focus. This is the first indication that the user is leaving our activity (though it does not always mean the activity is being destroyed).
+
 * This does not mean that the activity is no longer visible, it may still be visible, it just has lost focus.
 
 *  There are several reasons why an activity may enter this state. For example:
- * In Android 7.0 (API level 24) or higher, multiple apps run in multi-window mode. Because only one of the apps (windows) has focus at any time, the system pauses all of the other apps.
- * A new, semi-transparent activity (such as a dialog) opens. As long as the activity is still partially visible but not in focus, it remains paused.
-
+  * In Android 7.0 (API level 24) or higher, multiple apps run in multi-window mode. Because only one of the apps (windows) has focus at any time, the system pauses all of the other apps.
+  * A new, semi-transparent activity (such as a dialog) opens. As long as the activity is still partially visible but not in focus, it remains paused.
 
 * You can also use the ```onPause()``` method to release system resources, handles to sensors (like GPS), or any resources that may affect battery life while your activity is paused and the user does not need them. However, as mentioned above in the ```onResume()``` section, a *Paused* activity may still be fully visible if in multi-window mode. As such, you should consider using ```onStop()``` instead of ```onPause()``` to fully release or adjust UI-related resources and operations to better support multi-window mode.
 
@@ -98,17 +98,19 @@ But if the 1. system had closed the process on which this acitivity resided, or 
 
 #### [Single Activity](#single-activity)
 
-##### Single-activity application: application started, finished and restarted by the user:
+#### Single-activity application: application started, finished and restarted by the user:
 
 * Triggered by:
    * The user presses the Back button, or
    * The Activity.finish() method is called
-![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_2.png)
+   
+  ![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/lifecycle_2.png)
+
 * Managing State:
    * onSaveInstanceState is not called (since the activity is finished, you don’t need to save state)
    * onCreate doesn’t have a Bundle when the app is reopened, because the activity was finished and the state doesn’t need to be restored.
    
-##### Single-activity application: User navigates away from application
+#### Single-activity application: User navigates away from application
 * Triggered by:
    * The user presses the Home button
    * The user switches to another app (via Overview menu, from a notification, accepting a call, etc.)
@@ -120,7 +122,7 @@ In this scenario the system will stop the activity, but won’t immediately fini
    * onSaveInstanceState is called, system uses onSaveInstanceState to save the app state in case the system kills the app’s process later on (see below).
    * If the process isn’t killed, the activity instance is kept resident in memory, retaining all state. When the activity comes back to the foreground, the activity recalls this information. You don’t need to re-initialize components that were created earlier.
 
-##### Single-activity application: Configuration changes
+#### Single-activity application: Configuration changes
 * Triggered by:
   * Configuration changes, like a rotation, language change
   * User resizes the window in multi-window mode
@@ -131,7 +133,7 @@ In this scenario the system will stop the activity, but won’t immediately fini
   * The activity is completely destroyed, but the state is saved and restored for the new instance.
   * The Bundle in onCreate and onRestoreInstanceState is the same.
   
-##### Single-activity application: App is paused by the system
+#### Single-activity application: App is paused by the system
 * Triggered by:
   * Enabling Multi-window mode (API 24+) and losing the focus
   * Another app partially covers the running app (a purchase dialog, a runtime permission dialog, a third-party login dialog…)
@@ -146,8 +148,6 @@ In this scenario the system will stop the activity, but won’t immediately fini
 #### [Multiple Activities](#multiple-activities)
 #### [Fragments](#multiple-activities)
 #### [ViewModels, Translucent Activities and Launch Modes](#view-models-translucent-activities-launch-modes)
-
-
 
 
 #### Launch Modes
