@@ -6,9 +6,6 @@
       * [Multiple Activities](#multiple-activities)
       * [Fragments](#multiple-activities)
       * [ViewModels, Translucent Activities and Launch Modes](#view-models-translucent-activities-launch-modes)
-* [Difference between onCreate and onStart](#difference-between-oncreate-and-onstart)
-* [Scenario where onDestroy is called without onPause or onStop](#scenario-where-onDestroy-is-called-without-onPause-or-onStop)
-* [Configuration Changes](#configuration-changes)
 * [Tasks and BackStack](#tasks-and-backstacks)
 * [Launch Modes](#launch-modes)
     * [Standard](#standard)
@@ -179,6 +176,21 @@ Note: Grouped events that appear side by side run in parallel, so the order of c
 #### [Fragments](#fragments)
 #### [ViewModels, Translucent Activities and Launch Modes](#view-models-translucent-activities-launch-modes)
 
+#### [Tasks and BackStack](#tasks-and-backstacks)
+
+A task is a collection of activities, and it uses a Back Stack to arrange them(activities) with the order in which they were opened.  
+Each task has its own back stack in addition to some other information and/or data.
+Each app has its own one or more tasks.
+
+0. So when we tap the launcher icon for our app, the system is looking for a previously existing task (determined by the Intent and Activity it points to) to resume — getting us back to exactly where we were. If no existing task is found, then a new task is created with our newly launched activity as the base activity on the task’s back stack.
+1. Further, when we start a new activity using ```startActivity()```, we are pushing a new activity onto our task, causing the previous Activity to be paused and stopped.
+2. If we press the back button, By default it will pop the stack, calling finish() on the topmost activity, destroying it and removing it from the back stack 
+3. And we are taken back to the previous activity. This repeats until there’s nothing left in the back stack and you’re back at the launcher.
+
+
+The same principles apply to fragments as well:
+1. When we provide a fragment transaction to add, replace, or remove a fragment from your UI, you can use addToBackStack() to effectively add the FragmentTransaction to the back stack.
+2. Then when the user hits the back button, instead of activity being popped,the fragment transaction is reversed. Only when there are no more fragment transactions, the activity is finished.
 
 #### Launch Modes
 
@@ -213,36 +225,3 @@ If we launch activity B again with the launch mode as "singleTask", the new acti
 ##### [SingleInstance](#SingleInstance)
 
 ---------
-
-
-
-#### Difference between onCreate and onStart
-* **```onCreate()```**: The ```onCreate()``` is called only once during the activity lifecycle, either when the application starts, or when the activity has been destroyed and then recreated, for example during a configuration change.
-
-* **```onStart()```**: The ```onStart()``` method can be called multiple times during the lifecycle of the activity. It is called whenever the activity becomes visible to the user.
-
-
-#### Scenario where onDestroy is called without onPause or onStop
-
-* ```onPause()``` and ```onStop()``` will not be invoked if ```finish()``` is called from within the ```onCreate()``` method. This might occur, for example, if you detect an error during ```onCreate()``` and call ```finish()``` as a result. In such a case, though, any cleanup you expected to be done in ```onPause()``` and ```onStop()``` will not be executed.
-
-```java
-protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        finish();
-    }
-
-```
-
-### Configuration Changes
-
-* Any configuration change will cause Android to restart your Activity. A configuration change might be 
-    * the device rotating (because now we have a different screen layout to draw upon), 
-    *  a language switch (because we need to re-write all those strings, which may need more room now OR it could be the scary RTL switch!), 
-    * or even keyboard availability. 
-* What’s happening here is that the system is trying to be helpful and reload your app with the correct resources. When such configuration changes happen, Android usually destroys your application's existing Activities and Fragments and recreates them. Android does this so that your application can reload resources based on the new configuration. 
-
-* When it destroys your Activities and Fragments it will end up creating new instances of them which will wipe out all of your member variables. To work around this, Android gives you the opportunity to save your app’s state before destroying your Activities and Fragments, and the opportunity to restore your state when recreating them.
-
-TODO: savedInstanceState
