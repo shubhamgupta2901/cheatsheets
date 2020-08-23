@@ -4,9 +4,9 @@
    * [Lifecycle Scenarios](#lifecycle-scenarios)
       * [Single Activity](#single-activity)
       * [Multiple Activities](#multiple-activities)
-      * [Fragments](#multiple-activities)
+      * [Fragments](#fragments)
       * [ViewModels, Translucent Activities and Launch Modes](#view-models-translucent-activities-launch-modes)
-* [Tasks and BackStack](#tasks-and-backstacks)
+* [Tasks and BackStack](#tasks-and-backstack)
 * [Launch Modes](#launch-modes)
     * [Standard](#standard)
     * [SingleTop](#singletop)
@@ -176,7 +176,7 @@ Note: Grouped events that appear side by side run in parallel, so the order of c
 #### [Fragments](#fragments)
 #### [ViewModels, Translucent Activities and Launch Modes](#view-models-translucent-activities-launch-modes)
 
-#### [Tasks and BackStack](#tasks-and-backstacks)
+#### [Tasks and BackStack](#tasks-and-backstack)
 
 A task is a collection of activities, and it uses a Back Stack to arrange them(activities) with the order in which they were opened.  
 Each task has its own back stack in addition to some other information and/or data.
@@ -201,27 +201,97 @@ The same principles apply to fragments as well:
 * if ```ActivityA``` starts ```ActivityB```, ```ActivityB``` can define in its manifest how it should associate with the current task and ```ActivityA``` can also request how ```ActivityB``` should associate with current task using intent flags. If both activities define how ```ActivityB``` should be associated with a task, then ```ActivityA's``` request (as defined in the intent) is honored over ```ActivityB's``` request (as defined in its manifest).
 
 ##### [Standard](#standard) 
-* It is the **default** launchMode. It creates a new instance of an activity in the task from which it was started. Multiple instances of the activity can be created and multiple instances can be added to the same or different tasks. 
-Eg: Suppose there is an activity stack of A -> B -> C. 
-Now if we launch B again with the launch mode as "standard", the new stack will be A -> B -> C -> B.
+* It is the **default** launchMode. It creates a new instance of an activity in the task from which it was started. Multiple instances of the activity can be created and multiple instances can be added to the same or different tasks.
+
+* Scenario 1: 
+Current Stack: A->B
+New Action: C was launched
+Now: A -> B -> C 
+What happened: Since the launch mode was standard, new instance of C was created and was placed in the task.
+
+* Scenario 2: 
+Current Stack: A->B->C
+New Action: we launch B again with the launch mode as "standard"
+Now: A -> B -> C -> B.
+What happened: Since the launch mode was standard, new instance of B was created and was placed in the task, even though B already exists in stack.
+
     
 ##### [SingleTop](#SingleTop)
 * It is the same as the standard, except if there is a previous instance of the activity that exists in the top of the stack, then it will not create a new instance but rather send the intent to the existing instance of the activity.
-Eg: Suppose there is an activity stack of A -> B. 
-Now if we launch C with the launch mode as "singleTop", the new stack will be A -> B -> C as usual. 
-Now if there is an activity stack of A -> B -> C. 
-If we launch C again with the launch mode as "singleTop", the new stack will still be A -> B -> C.
 
-* For example, suppose a task's back stack consists of root activity A with activities B, C, and D on top (the stack is A-B-C-D; D is on top). An intent arrives for an activity of type D. If D has the default "standard" launch mode, a new instance of the class is launched and the stack becomes A-B-C-D-D. However, if D's launch mode is "singleTop", the existing instance of D receives the intent through ```onNewIntent()```, because it's at the top of the stack—the stack remains A-B-C-D. However, if an intent arrives for an activity of type B, then a new instance of B is added to the stack, even if its launch mode is "singleTop"
+* Scenario 1: 
+Current Stack: A->B
+New Action: C was launched
+Now: A -> B -> C 
+What happened: New instance of C was created and was placed in the task.
+
+* Scenario 2: 
+Current Stack: A->B->C
+New Action: we launch B again with the launch mode as "singleTop"
+Now: A -> B -> C -> B.
+What happened: Since the launch mode was standard, new instance of B was created and was placed in the task, even though B already exists in stack.
+
+* Scenario 3: 
+Current Stack: A->B->C
+New Action: we launch C again with the launch mode as "singletop"
+Now: A -> B -> C.
+What happened: C was launched again with the launch mode as "singleTop", the new stack will still be A -> B -> C. The existing instance of C receives the intent through ```onNewIntent()```, because it's at the top of the stack
+
 
 ##### [SingleTask](#SingleTask)
 * The system creates a new task and instantiates the activity at the root of the new task.
 * However, if an instance of the activity already exists in a separate task, the system routes the intent to the existing instance through a call to its ```onNewIntent()``` method, rather than creating a new instance.
-* Eg: Suppose there is an activity stack of A -> B -> C -> D. 
-Now if we launch D with the launch mode as "singleTask", the new stack will be A -> B -> C -> D as usual.
-* Now if there is an activity stack of A -> B -> C -> D. 
-If we launch activity B again with the launch mode as "singleTask", the new activity stack will be A -> B. Activities C and D will be destroyed.
+
+* Scenario 1: 
+Current Stack: A->B
+New Action: C is launched with Single Task.
+Now: A->B  || C 
+What happened: (New taks was created, and C was placed at the root of new task) (|| indicates new task)
+
+* Scenario 2: 
+Current Stack: A->B->C->D
+New Action: C is launched with Single Task
+Now: A->B->C 
+What Happened: C already existed in seperate task, the system does not create new instance, it delivers intent through C's onNewIntent, and D is destroyed.
+
+* Scenario 3: 
+Current Stack: A->B->C
+New Action: C is launched with Single Task
+Now: A->B->C 
+What Happened: C already existed in seperate task, the system does not create new instance, it delivers intent through C's onNewIntent, No activity on top of C to be destroyed.
+
+* Scenario 3: 
+Current Stack: A->B->C(Was launched with single task)->D
+New Action: D is launched without launch mode
+Now: A->B-> || C->D
+What Happened: C had created a new task, D was created and placed in C's new task.
+
 
 ##### [SingleInstance](#SingleInstance)
 
----------
+* Scenario 1:
+Current Stack: A->B->C
+New Action: D is started with launch Mode: singleInstance
+Now: A->B->C || D
+What Happened: When E is started with single Instance new task for it is created, and it is placed in the root of new task.
+
+
+* Scenario 2:
+Current Stack: A->B->C || D (D was started with singleInstance)
+New Action: E is started from D
+Now: D || A->B->C->E
+What Happened:  Android launches activity E into the task containing A->B->C (it cannot launch it into the task containing D because D is defined as "singleInstance", so it launches it into a task that has the same "taskAffinity", in this case the task containing A->B->C). To do that, Android brings the task containing A->B->C to the front. Now you have 2 tasks: The task containing A->B->C-> in the front, and the second one containing D below that.
+
+Another Action: Press Back Button
+What Happened: it finishes activity E and returns to the activity below that in the task, namely C. You still have 2 tasks: The one containing C in the front, and the one containing D below that.
+
+Anther Action: Pressing Back key when there were two tasks: D || A
+Now you press the BACK key again. This finishes activity A (and thereby finishes the task that held A) and brings the previous task in the task stack to the front, namely the task containing D. You now have 1 task: the task containing D.
+
+
+* Scenario 3:
+Current Stack: D || A->B->C->E (D was started with single Instance)
+New Action: D is started from E again
+Now: A->B->C->E || D 
+What Happened: D's task comes in foreground, existing instance of D gets data through onNewIntent(bundle)
+
