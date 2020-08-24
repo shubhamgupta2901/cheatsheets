@@ -2,10 +2,10 @@
 
 * View is the basic building block of UI(User Interface) in android.
 * A View is a superclass for all the UI components
-* Every view occupies a rectangle shape on screen that shows some type of content. It can be an image, a piece of text, a button or anything that an android application can display.
+* Every view occupies a rectangle shape on screen that shows some type of content. It can be an image, a piece of text, a button or anything that an android application can display. Example: TextView, EditText, Button etc.
 
 ### What is ViewGroup
-* A group of view is known as ViewGroup. 
+* ViewGroup is like a container of Views. A group of view is known as ViewGroup. 
 * A ViewGroup can have other views and view groups are its children. 
  * For example, under a LinearLayout, you can add two Buttons and one EditText. Here, LinearLayout is the parent view and the Buttons and EditTexts are the children.
 
@@ -76,7 +76,7 @@ protected void onDraw(Canvas canvas) {
     canvas.drawRect(mRect, mPaint);
 }
 ```
-* The ```ANTI_ALIAS_FLAG``` is used for creating smooth renders of views.
+* The ```ANTI_ALIAS_FLAG``` is used to make the edges smooth while drawing
 
 5) For dynamic attributes, create a declare-style in attrs.xml, This has array of <attr> with name and format keys.
 ```
@@ -138,11 +138,10 @@ public boolean onTouchEvent(MotionEvent event) {
 }
 ```
 
-*The final implementation of Custom View with a square, circle and image above it:
+* The final implementation of Custom View with a square, circle and image above it:
 
 ```
 package ai.guru.testapp.customview;
-
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -302,4 +301,22 @@ public class CustomView extends View {
     }
 }
 ```
+
+### What is canvas?
+* When we draw custom views, Canvas is the interface that allows us to draw custom designs like line, circle,rectangle ect.
+* Drawing of canvas happens in Bitmap, (Canvas is a wrapper over Bitmap) In Canvas we draw the outline and then the Paint API helps to fill color. Canvas helps to create the skeleton and Paint helps in beautifying the design.
+* Canvas follows the coordinate system to draw itself on the screen. It considers the phone screen as its own coordinate system. The top left corner represents the (0,0) point in the coordinate system and bottom right is then (x,y) point in the coordinate system.
+* Canvas works on pixels and not dp.
+
+
+### Custom View Lifecycle
+![](https://github.com/shubhamgupta2901/repo_assets/blob/master/cheatsheets/android/lifecycle/android_view_lifecycle.png)
+
+The views are drawn using following three methods:
+1. At first onMeasure() gets called where Android measures the UI from top to bottom, First, it takes the parents container. their children and so on. In onMeasure() children get the constraints provided by their parents. 
+2. Then, onLayout() is called to plot the positions of the Widgets.
+3. and onDraw() is called where the UI gets rendered. The drawing happens on the main UI thread, so it blocks the main thread till the execution gets completed. For heavier and complicated definitions of onDraw(), you can also feel a little bit of lag.
+Also, in a View's lifecycle, which is attached to a component, onDraw can get called multiple number of times, every time, invalidate() is called or the parent component is destroyed and created again, due to config changes. So object should not be created here.
+
+
 
