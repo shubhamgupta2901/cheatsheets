@@ -319,4 +319,14 @@ The views are drawn using following three methods:
 Also, in a View's lifecycle, which is attached to a component, onDraw can get called multiple number of times, every time, invalidate() is called or the parent component is destroyed and created again, due to config changes. So object should not be created here.
 
 
+### SurfaceView
+
+* In Android, Views are drawn on the UI/main thread. This is also used  all user interaction. 
+* As a result, if we need to update the UI rapdidly like changing the preview of a camera or animations, the renderting takes too much time, and due to the heavy execution of onDraw(), the user experience is also affected.
+* For such cases, we can use SurfaceView. It provides a Surface, on which the views are drawn on a background thread, and once Surface is drawn or updated, through callbacks we can get the same information in the UI thread.
+* Issues with SurfaceView:
+    * surfaceView has dedicated Surface buffer while all the view shares one surface buffer that is allocated by ViewRoot. In another word, surfaceView cost more resources.
+    * surfaceView cannot be hardware accelerated (as of JB4.2) while 95% operations on normal View are HW accelerated. [the Android 2D rendering pipeline supports hardware acceleration, meaning that all drawing operations that are performed on a View's canvas use the GPU. Because of the increased resources required to enable hardware acceleration, your app will consume more RAM]
+
+
 
