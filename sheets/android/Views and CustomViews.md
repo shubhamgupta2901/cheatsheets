@@ -328,5 +328,132 @@ Also, in a View's lifecycle, which is attached to a component, onDraw can get ca
     * surfaceView has dedicated Surface buffer while all the view shares one surface buffer that is allocated by ViewRoot. In another word, surfaceView cost more resources.
     * surfaceView cannot be hardware accelerated (as of JB4.2) while 95% operations on normal View are HW accelerated. [the Android 2D rendering pipeline supports hardware acceleration, meaning that all drawing operations that are performed on a View's canvas use the GPU. Because of the increased resources required to enable hardware acceleration, your app will consume more RAM]
 
+Example:
+
+```java
+package com.javacodegeeks.androidsurfaceviewexample;
+ 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+ 
+import android.app.Activity;
+import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.ShutterCallback;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+ 
+public class AndroidSurfaceviewExample extends Activity implements SurfaceHolder.Callback {
+    TextView testView;
+ 
+    Camera camera;
+    SurfaceView surfaceView;
+    SurfaceHolder surfaceHolder;
+ 
+    PictureCallback rawCallback;
+    ShutterCallback shutterCallback;
+    PictureCallback jpegCallback;
+ 
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+ 
+        setContentView(R.layout.activity_main);
+ 
+        surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        surfaceHolder = surfaceView.getHolder();
+ 
+        // Install a SurfaceHolder.Callback so we get notified when the
+        // underlying surface is created and destroyed.
+        surfaceHolder.addCallback(this);
+    }
+ 
+    public void captureImage(View v) throws IOException {
+        //take the picture
+        camera.takePicture(null, null, jpegCallback);
+    }
+ 
+    public void refreshCamera() {
+        if (surfaceHolder.getSurface() == null) {
+            // preview surface does not exist
+            return;
+        }
+ 
+        // stop preview before making changes
+        try {
+            camera.stopPreview();
+        } catch (Exception e) {
+            // ignore: tried to stop a non-existent preview
+        }
+ 
+        // set preview size and make any resize, rotate or
+        // reformatting changes here
+        // start preview with new settings
+        try {
+            camera.setPreviewDisplay(surfaceHolder);
+            camera.startPreview();
+        } catch (Exception e) {
+ 
+        }
+    }
+ 
+    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+        // Now that the size is known, set up the camera parameters and begin
+        // the preview.
+        refreshCamera();
+    }
+ 
+    public void surfaceCreated(SurfaceHolder holder) {
+        try {
+            // open the camera
+            camera = Camera.open();
+        } catch (RuntimeException e) {
+            // check for exceptions
+            System.err.println(e);
+            return;
+        }
+        Camera.Parameters param;
+        param = camera.getParameters();
+ 
+        // modify parameter
+        param.setPreviewSize(352, 288);
+        camera.setParameters(param);
+        try {
+            // The Surface has been created, now tell the camera where to draw
+            // the preview.
+            camera.setPreviewDisplay(surfaceHolder);
+            camera.startPreview();
+        } catch (Exception e) {
+            // check for exceptions
+            System.err.println(e);
+            return;
+        }
+    }
+ 
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        // stop preview and release camera
+        camera.stopPreview();
+        camera.release();
+        camera = null;
+    }
+ 
+}
+```
+
+### Difference between RelativeLayout and LinearLayout?
+
+Linear Layout - Arranges elements either vertically or horizontally. i.e. in a row or column.
+Relative Layout - Arranges elements relative to parent and other siblings.
+
+### Constraint Layout
+* It allows you to create large and complex layouts with a flat view hierarchy (no nested view groups). This has the benefit of avoiding many problems inherent in nesting layouts. Since we design flat or shallow layout hierarchies. This leads to less complex layouts and improved user interface rendering performance at runtime.
+* It's similar to RelativeLayout in that all views are laid out according to relationships between sibling views and the parent layout, but it's more flexible than RelativeLayout and easier to use with Android Studio's Layout Editor.
 
 
